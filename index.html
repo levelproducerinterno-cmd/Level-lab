@@ -281,23 +281,23 @@ async function abrirTablero(token, adminVolver){
 }
 
 const TEXTO_AVISO = `
-  <p>¡Qué gusto tenerte en el taller! Este tablero es tuyo: aquí vas a organizar tus proyectos, tus clientes y tus cobros para que tu negocio camine con más orden y más tranquilidad.</p>
+  <p>Para que tu tablero funcione, la información que registras en él (tus proyectos, clientes, montos y cobranza) se guarda en una base de datos.</p>
   <h4>¿Quién puede ver tu tablero?</h4>
-  <p>Tú, y Sofía Loarca, quien te acompaña en el taller. Poder ver cómo vas le permite darte consejos más útiles, resolver tus dudas con ejemplos reales y ayudarte a encontrar oportunidades en tus ventas y en tu cobranza.</p>
-  <h4>¿Para qué se usa tu información?</h4>
-  <p>Solo para acompañarte durante tu proceso. No la compartimos con nadie, no la vendemos y no la usamos para contactar a tus clientes ni para ningún otro fin.</p>
-  <h4>¿Cómo la cuidamos?</h4>
-  <p>Tu tablero se guarda de forma privada en la plataforma de Level Producer y solo se abre con tu link personal. Por eso te recomendamos guardarlo para ti.</p>
+  <p>Tú, con tu link personal. Te recomendamos guardarlo y no compartirlo.</p>
+  <h4>¿Dónde se guarda tu información?</h4>
+  <p>En la base de datos de Level Producer, que se resguarda de forma privada. La única persona con acceso a esta base de datos es Sofía Loarca, quien te acompaña en el taller.</p>
+  <h4>¿Cómo cuidamos tu información?</h4>
+  <p>Tu información es tuya. No la compartimos, no la vendemos y no la usamos para contactar a tus clientes. Solo nos sirve para mantener tu tablero funcionando, guardar tus avances y ayudarte si algo no funciona como debería.</p>
   <h4>Tú decides</h4>
-  <p>Si en algún momento quieres que borremos tu tablero y toda tu información, solo pídelo y lo hacemos, sin preguntas.</p>`;
+  <p>Si en algún momento quieres que borremos tu tablero y toda tu información, solo pídelo y lo hacemos.</p>`;
 
 function mostrarAvisoPrivacidad(){
   app.innerHTML = `
     <div class="aviso">
-      <div class="hero-marca">Organiza tus proyectos · Aviso de privacidad</div>
-      <h1>Tu información, en buenas manos 🤝</h1>
+      <div class="hero-marca">Organiza tus proyectos</div>
+      <h1>Aviso de privacidad</h1>
       ${TEXTO_AVISO}
-      <p class="aviso-acepta">Al dar clic en <strong>Acepto</strong>, nos das permiso para que Sofía Loarca y el equipo de Level Producer puedan ver tu tablero, con el único fin de acompañarte en el taller.</p>
+      <p class="aviso-acepta">Al dar clic en <strong>Acepto</strong>, autorizas que la información de tu tablero se guarde en la base de datos de Level Producer, en los términos de este aviso.</p>
       <button class="btn" id="b-acepto" style="width:100%;">Acepto, ir a mi tablero</button>
     </div>`;
   document.getElementById('b-acepto').addEventListener('click', async e => {
@@ -316,7 +316,7 @@ function mostrarAvisoPrivacidad(){
 function verAvisoPrivacidad(){
   const bg = document.createElement('div');
   bg.className = 'modal-bg';
-  bg.innerHTML = `<div class="modal aviso-modal"><h3>Tu información, en buenas manos 🤝</h3>${TEXTO_AVISO}
+  bg.innerHTML = `<div class="modal aviso-modal"><h3>Aviso de privacidad</h3>${TEXTO_AVISO}
     <p class="ayuda">Aceptado el ${new Date(T.alumno.acepto_privacidad).toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' })}.</p>
     <div class="modal-pie"><div class="der"><button class="btn" data-cerrar>Cerrar</button></div></div></div>`;
   document.body.appendChild(bg);
