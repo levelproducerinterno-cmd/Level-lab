@@ -484,6 +484,44 @@
     .curso-tabs button{flex:1;}
     .clases-avance .barra{width:120px;}
   }
+
+  /* ===== Comentarios ===== */
+  .av{width:40px;height:40px;border-radius:50%;background:var(--negro);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex:0 0 auto;overflow:hidden;}
+  .av img{width:100%;height:100%;object-fit:cover;display:block;}
+  .av-sofia{background:#2b2620;color:#f3ede3;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.35rem;font-weight:600;}
+  .av-xl{width:120px;height:120px;font-size:2rem;}
+  .avatar{overflow:hidden;}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .perfil-av{margin:6px 0 14px;}
+  .coms{border-top:1px solid var(--linea);padding:18px 20px 20px;}
+  .coms-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+  .coms-head h3{margin:0;font-size:1.05rem;}
+  .coms-head h3 span{background:var(--hueso2);border-radius:20px;padding:1px 9px;font-size:0.8rem;margin-left:4px;}
+  .coms-nuevo{display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;}
+  .coms-yo{background:none;border:none;padding:0;}
+  .coms-caja{flex:1;min-width:0;}
+  .coms-caja textarea{width:100%;border:1px solid var(--linea);border-radius:12px;padding:10px 12px;font-size:16px;font-family:inherit;resize:vertical;}
+  .coms-acc{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;}
+  .coms-link{background:none;border:none;font-size:0.82rem;font-weight:600;color:#5b574f;text-decoration:underline;margin-right:auto;padding:0;}
+  .coms-lista{display:flex;flex-direction:column;gap:14px;}
+  .com{display:flex;gap:10px;align-items:flex-start;}
+  .com-cuerpo{flex:1;min-width:0;background:var(--hueso);border-radius:4px 14px 14px 14px;padding:10px 14px;}
+  .com-sofia .com-cuerpo{background:#f3ede3;border:1px solid #e3d8c4;}
+  .com-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:0.85rem;}
+  .com-badge{font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:var(--negro);color:#fff;border-radius:20px;padding:2px 8px;}
+  .com-fecha{color:var(--gris);font-size:0.75rem;}
+  .com-borrar{margin-left:auto;background:none;border:none;color:var(--gris);font-size:0.75rem;text-decoration:underline;padding:0;}
+  .com-cuerpo p{margin:4px 0 0;white-space:pre-line;font-size:0.92rem;line-height:1.5;overflow-wrap:anywhere;}
+  .clase-tit{flex:1;}
+  .clase-coms{font-size:0.72rem;color:var(--gris);flex:0 0 auto;}
+  .mundo-top{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .mundo-perfil{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--linea);border-radius:999px;padding:4px 14px 4px 4px;font-weight:600;font-size:0.82rem;color:var(--texto);}
+  .mundo-perfil .av{width:32px;height:32px;font-size:0.7rem;}
+  .adm-coms{display:flex;flex-direction:column;gap:14px;max-width:760px;}
+  .adm-com-clase{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+  .adm-com-tit{font-weight:700;font-size:0.9rem;}
+  .adm-com-resp{display:flex;gap:8px;}
+  .adm-com-resp input{flex:1;min-width:0;border:1px solid var(--linea);border-radius:9px;padding:10px 12px;font-size:16px;}
 </style>
 </head>
 <body>
@@ -691,6 +729,8 @@ const TEXTO_AVISO = `
   <p>Para que tu espacio en Level Lab funcione, la información que registras (tus proyectos, clientes, montos, cobranza y avance en las clases) se guarda en una base de datos.</p>
   <h4>¿Quién puede ver tu tablero?</h4>
   <p>Solo tú. Tu tablero se abre con tu link personal y un PIN de 4 números que tú eliges. Sin tu PIN, nadie puede entrar a tu tablero, aunque tenga tu link.</p>
+  <h4>Comentarios en las clases</h4>
+  <p>Si comentas en una clase, tu comentario, tu nombre y tu foto de perfil (si subes una) los ven tus compañeros del mismo taller. Puedes borrar tus comentarios cuando quieras. Tu tablero sigue siendo solo tuyo.</p>
   <h4>¿Dónde se guarda tu información?</h4>
   <p>En la base de datos de Level Producer, que se resguarda de forma privada. La única persona con acceso a esta base de datos es Sofía Loarca, quien te acompaña en los talleres.</p>
   <h4>¿Cómo cuidamos tu información?</h4>
@@ -2972,7 +3012,10 @@ function renderMundo(){
   };
   app.innerHTML = `
     <div class="mundo">
-      <img class="logo" src="/logo-levellab.png" alt="Level Lab">
+      <div class="mundo-top">
+        <img class="logo" src="/logo-levellab.png" alt="Level Lab">
+        <button class="mundo-perfil" id="b-perfil" title="Tu foto de perfil">${avatarDe(T.alumno.nombre, T.alumno.foto)}<span>${T.alumno.foto ? 'Mi perfil' : 'Pon tu foto'}</span></button>
+      </div>
       <div class="hero-marca">${MARCA}</div>
       <h1>Hola, ${esc(primerNombre)} 👋</h1>
       <p>Te damos la bienvenida a tu espacio. Aquí viven tus talleres: sus clases en video y tus herramientas. Entra al que quieras.</p>
@@ -2985,6 +3028,7 @@ function renderMundo(){
     </div>`;
   document.getElementById('b-aviso').addEventListener('click', e => { e.preventDefault(); verAvisoPrivacidad(); });
   document.getElementById('b-salir').addEventListener('click', e => { e.preventDefault(); recordarPin(T.token, null); abrirTablero(T.token, null); });
+  document.getElementById('b-perfil').addEventListener('click', () => abrirPerfil(renderMundo));
   app.querySelectorAll('[data-curso]').forEach(b => b.addEventListener('click', () => {
     const c = T.cursos.find(x => x.slug === b.dataset.curso);
     if(c.tiene) irA('#/' + c.slug); else verCursoBloqueado(c);
@@ -3079,13 +3123,15 @@ function renderClases(){
               ${c.herramienta ? '<button class="btn ghost" data-vista="tablero">Practicar en mi tablero</button>' : ''}
             </div>
           </div>
+          <section class="coms" id="coms" data-modulo="${m.id}"></section>
         </div>
         <ol class="clase-lista">
           ${mods.map((x, k) => `<li><button class="${x.id === m.id ? 'on' : ''} ${vistos.has(x.id) ? 'vista' : ''}" data-clase="${x.id}">
-            <span class="clase-num">${vistos.has(x.id) ? '✓' : k + 1}</span><span>${esc(x.titulo)}</span></button></li>`).join('')}
+            <span class="clase-num">${vistos.has(x.id) ? '✓' : k + 1}</span><span class="clase-tit">${esc(x.titulo)}</span>${+x.n_comentarios ? `<span class="clase-coms">💬 ${x.n_comentarios}</span>` : ''}</button></li>`).join('')}
         </ol>
       </div>`}`;
   app.querySelectorAll('[data-clase]').forEach(b => b.addEventListener('click', () => { T.claseActual = b.dataset.clase; renderClases(); }));
+  if(m) renderComentarios(m);
   const sig = app.querySelector('[data-siguiente]');
   if(sig) sig.addEventListener('click', () => { T.claseActual = mods[i + 1].id; renderClases(); window.scrollTo({ top:0, behavior:'smooth' }); });
   const bv = app.querySelector('[data-visto]');
@@ -3098,6 +3144,133 @@ function renderClases(){
     const { data, error } = await sb.rpc('taller_marcar_visto', { p_token: T.token, p_pin: T.pin, p_modulo: m.id, p_visto: si });
     if(pinRechazado(data)) return;
     if(error) toast('No se pudo guardar. Revisa tu conexión.');
+  });
+}
+
+// ============ Comentarios entre alumnos y foto de perfil ============
+function avatarDe(nombre, foto, sofia, clase){
+  if(sofia) return `<span class="av ${clase || ''} av-sofia">S</span>`;
+  if(foto) return `<span class="av ${clase || ''}"><img src="${esc(foto)}" alt=""></span>`;
+  return `<span class="av ${clase || ''}">${esc(iniciales(nombre || '?'))}</span>`;
+}
+function haceRato(f){
+  const min = Math.floor((Date.now() - new Date(f)) / 60000);
+  if(min < 1) return 'ahora';
+  if(min < 60) return `hace ${min} min`;
+  if(min < 1440) return `hace ${Math.floor(min / 60)} h`;
+  if(min < 2880) return 'ayer';
+  return new Date(f).toLocaleDateString('es-MX', { day:'numeric', month:'short' });
+}
+function htmlComentario(k, extra){
+  const autor = k.es_sofia ? 'Sofía' : (k.nombre || 'Alumno');
+  return `
+    <div class="com ${k.es_sofia ? 'com-sofia' : ''}">
+      ${avatarDe(k.nombre, k.foto, k.es_sofia)}
+      <div class="com-cuerpo">
+        <div class="com-head"><strong>${esc(autor)}</strong>${k.es_sofia ? '<span class="com-badge">Level Lab</span>' : ''}<span class="com-fecha">${haceRato(k.creado)}</span>${extra || ''}</div>
+        <p>${esc(k.texto)}</p>
+      </div>
+    </div>`;
+}
+
+async function renderComentarios(m, recargar = true){
+  const sec = document.getElementById('coms');
+  if(!sec || sec.dataset.modulo !== m.id) return;
+  T.coms = T.coms || {};
+  const lista = T.coms[m.id];
+  sec.innerHTML = `
+    <div class="coms-head"><h3>💬 Comentarios${lista ? ` <span>${lista.length}</span>` : ''}</h3><span class="ayuda">Los ven tus compañeros de este taller.</span></div>
+    <div class="coms-nuevo">
+      <button class="coms-yo" id="coms-foto" title="Cambiar mi foto">${avatarDe(T.alumno.nombre, T.alumno.foto)}</button>
+      <div class="coms-caja">
+        <textarea id="coms-txt" rows="2" maxlength="2000" placeholder="Comparte una duda, un aprendizaje o cómo te fue al aplicarlo…">${esc(T.borradorCom || '')}</textarea>
+        <div class="coms-acc">${T.alumno.foto ? '' : '<button class="coms-link" id="coms-foto2">📷 Ponle foto a tu perfil</button>'}<button class="btn" id="coms-ok">Publicar</button></div>
+      </div>
+    </div>
+    <div class="coms-lista">${!lista ? '<p class="ayuda">Cargando comentarios…</p>'
+      : lista.length ? lista.map(k => htmlComentario(k, k.es_mio ? `<button class="com-borrar" data-borrar-com="${k.id}" title="Borrar mi comentario">Borrar</button>` : '')).join('')
+      : '<p class="ayuda coms-vacio">Todavía no hay comentarios. ¡Sé la primera persona en comentar!</p>'}</div>`;
+  const txt = document.getElementById('coms-txt');
+  txt.addEventListener('input', () => { T.borradorCom = txt.value; });
+  ['coms-foto', 'coms-foto2'].forEach(id => { const b = document.getElementById(id); if(b) b.addEventListener('click', () => abrirPerfil(() => renderComentarios(m, false))); });
+  document.getElementById('coms-ok').addEventListener('click', async e => {
+    const texto = txt.value.trim();
+    if(!texto){ txt.focus(); return; }
+    e.target.disabled = true; e.target.textContent = 'Publicando…';
+    const { data, error } = await sb.rpc('taller_comentar', { p_token: T.token, p_pin: T.pin, p_modulo: m.id, p_texto: texto });
+    if(pinRechazado(data)) return;
+    if(error){ e.target.disabled = false; e.target.textContent = 'Publicar'; toast('No se pudo publicar. Revisa tu conexión.'); return; }
+    T.borradorCom = '';
+    T.coms[m.id] = data; m.n_comentarios = data.length;
+    renderComentarios(m, false);
+    toast('¡Comentario publicado! 💬');
+  });
+  sec.querySelectorAll('[data-borrar-com]').forEach(b => b.addEventListener('click', async () => {
+    if(!confirm('¿Borrar tu comentario?')) return;
+    const { data, error } = await sb.rpc('taller_borrar_comentario', { p_token: T.token, p_pin: T.pin, p_id: b.dataset.borrarCom });
+    if(pinRechazado(data)) return;
+    if(error){ toast('No se pudo borrar.'); return; }
+    T.coms[m.id] = T.coms[m.id].filter(k => k.id !== b.dataset.borrarCom); m.n_comentarios = T.coms[m.id].length;
+    renderComentarios(m, false);
+  }));
+  if(!recargar) return;
+  const { data, error } = await sb.rpc('taller_comentarios', { p_token: T.token, p_pin: T.pin, p_modulo: m.id });
+  if(pinRechazado(data)) return;
+  if(error){ if(!lista){ const l = sec.querySelector('.coms-lista'); if(l) l.innerHTML = '<p class="ayuda">No se pudieron cargar los comentarios.</p>'; } return; }
+  T.coms[m.id] = data; m.n_comentarios = data.length;
+  renderComentarios(m, false);
+}
+
+// Recorta la foto al centro, cuadrada y chiquita (cabe de sobra en la base de datos)
+function fotoCuadrada(file, lado = 240){
+  return new Promise((ok, mal) => {
+    const lector = new FileReader();
+    lector.onerror = mal;
+    lector.onload = async () => {
+      try {
+        const img = await prCargarImg(lector.result);
+        const s = Math.min(img.width, img.height), c = document.createElement('canvas');
+        c.width = c.height = lado;
+        c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, lado, lado);
+        ok(c.toDataURL('image/jpeg', .82));
+      } catch(e){ mal(e); }
+    };
+    lector.readAsDataURL(file);
+  });
+}
+
+function abrirPerfil(alCambiar){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  const pintar = () => {
+    bg.innerHTML = `
+      <div class="modal" style="max-width:380px;text-align:center;">
+        <h3>Tu foto de perfil</h3>
+        <div class="perfil-av">${avatarDe(T.alumno.nombre, T.alumno.foto, false, 'av-xl')}</div>
+        <p class="ayuda" style="margin:0 0 16px;">Aparece junto a tus comentarios en las clases. Solo la ven tus compañeros de taller y Sofía.</p>
+        <label class="btn" style="display:block;cursor:pointer;">📷 ${T.alumno.foto ? 'Cambiar foto' : 'Subir foto'}<input type="file" accept="image/*" id="perfil-file" hidden></label>
+        ${T.alumno.foto ? '<button class="btn ghost" data-quitar style="width:100%;margin-top:8px;">Quitar foto</button>' : ''}
+        <button class="btn ghost" data-cerrar style="width:100%;margin-top:8px;">Listo</button>
+      </div>`;
+    bg.querySelector('#perfil-file').addEventListener('change', async e => {
+      const f = e.target.files[0]; if(!f) return;
+      try { await guardarFoto(await fotoCuadrada(f)); pintar(); } catch(err){ toast('No se pudo leer esa imagen.'); }
+    });
+  };
+  const guardarFoto = async foto => {
+    const { data, error } = await sb.rpc('taller_guardar_foto', { p_token: T.token, p_pin: T.pin, p_foto: foto });
+    if(pinRechazado(data)) return;
+    if(error){ toast('No se pudo guardar tu foto.'); return; }
+    T.alumno.foto = foto;
+    Object.values(T.coms || {}).forEach(l => l.forEach(k => { if(k.es_mio) k.foto = foto; }));
+    toast(foto ? '¡Foto guardada! 📷' : 'Foto quitada');
+    if(alCambiar) alCambiar();
+  };
+  pintar();
+  document.body.appendChild(bg);
+  bg.addEventListener('click', async e => {
+    if(e.target === bg || e.target.closest('[data-cerrar]')){ bg.remove(); return; }
+    if(e.target.closest('[data-quitar]')){ await guardarFoto(null); pintar(); }
   });
 }
 
@@ -3326,7 +3499,7 @@ function filaAlumno(a, c){
   const chips = c ? '' : `<div class="alumno-cursos">${ADM.cursos.filter(x => a.cursos.includes(x.id)).map(x => `<span style="--c:${esc(x.color || '#0a0908')}">${esc(x.emoji || '✦')} ${esc(x.nombre)}</span>`).join('') || '<span class="sin">Sin talleres</span>'}</div>`;
   return `
     <div class="alumno" data-alumno="${a.id}">
-      <div class="avatar">${esc(iniciales(a.nombre))}</div>
+      ${a.foto ? `<div class="avatar"><img src="${esc(a.foto)}" alt=""></div>` : `<div class="avatar">${esc(iniciales(a.nombre))}</div>`}
       <div class="alumno-info">
         <div class="alumno-nombre">${esc(a.nombre)}</div>
         <div class="alumno-sub">${c && n ? `${v}/${n} clases · ` : ''}${c && c.herramienta ? `${a.proyectos_propios} ${a.proyectos_propios == 1 ? 'proyecto' : 'proyectos'} · ` : ''}${haceCuanto(a.ultimo_acceso)} · ${a.tiene_pin ? '🔐 con PIN' : a.acepto_privacidad ? 'aceptó aviso, sin PIN' : 'sin aceptar aviso'}</div>
@@ -3486,6 +3659,12 @@ function renderAdminCurso(c){
     </section>
 
     <section class="adm-bloque">
+      <div class="seccion-head"><h2>💬 Comentarios</h2><span class="ayuda" id="adm-coms-n"></span></div>
+      <p class="seccion-intro">Lo que tus alumnos comentan en cada clase. Respóndeles aquí: tu respuesta aparece como <strong>Sofía · Level Lab</strong>.</p>
+      <div class="adm-coms" id="adm-coms"><p class="ayuda">Cargando comentarios…</p></div>
+    </section>
+
+    <section class="adm-bloque">
       <div class="seccion-head"><h2>👥 Alumnos</h2></div>
       ${bloqueAlumnos(alumnosDe(c), c)}
     </section>`;
@@ -3504,7 +3683,53 @@ function renderAdminCurso(c){
     if(r.some(x => x.error)) toast('No se pudo guardar el orden.');
   };
   app.querySelectorAll('[data-subir]').forEach(b => b.addEventListener('click', () => mover(+b.dataset.subir, -1)));
+  cargarComentariosAdmin(c);
   app.querySelectorAll('[data-bajar]').forEach(b => b.addEventListener('click', () => mover(+b.dataset.bajar, 1)));
+}
+
+// Comentarios del taller en el panel: los más recientes arriba, agrupados por clase
+async function cargarComentariosAdmin(c){
+  const caja = document.getElementById('adm-coms');
+  if(!caja) return;
+  if(!ADM.coms || ADM.coms.curso !== c.id){
+    const { data, error } = await adm('taller_admin_comentarios', { p_curso: c.id });
+    if(error){ caja.innerHTML = '<p class="ayuda">No se pudieron cargar los comentarios.</p>'; return; }
+    ADM.coms = { curso: c.id, lista: data };
+  }
+  pintarComentariosAdmin(c);
+}
+function pintarComentariosAdmin(c){
+  const caja = document.getElementById('adm-coms');
+  if(!caja) return;
+  const todos = ADM.coms.lista;
+  document.getElementById('adm-coms-n').textContent = todos.length ? `${todos.length} ${todos.length === 1 ? 'comentario' : 'comentarios'}` : '';
+  const clases = clasesDe(c).filter(m => todos.some(k => k.modulo_id === m.id))
+    .sort((a, b) => Math.max(...todos.filter(k => k.modulo_id === b.id).map(k => +new Date(k.creado))) - Math.max(...todos.filter(k => k.modulo_id === a.id).map(k => +new Date(k.creado))));
+  caja.innerHTML = clases.length ? clases.map(m => `
+    <div class="adm-com-clase">
+      <div class="adm-com-tit">▶ ${esc(m.titulo)}</div>
+      ${todos.filter(k => k.modulo_id === m.id).map(k => htmlComentario(k, `<button class="com-borrar" data-adm-borrar="${k.id}">Borrar</button>`)).join('')}
+      <div class="adm-com-resp"><input placeholder="Responder como Sofía…" data-adm-resp="${m.id}"><button class="btn" data-adm-enviar="${m.id}">Responder</button></div>
+    </div>`).join('') : '<p class="ayuda">Todavía no hay comentarios en este taller.</p>';
+  const enviar = async id => {
+    const inp = caja.querySelector(`[data-adm-resp="${id}"]`), texto = inp.value.trim();
+    if(!texto){ inp.focus(); return; }
+    inp.disabled = true;
+    const { data, error } = await adm('taller_admin_comentar', { p_modulo: id, p_texto: texto });
+    if(error){ inp.disabled = false; toast('No se pudo enviar.'); return; }
+    ADM.coms.lista.push(data);
+    pintarComentariosAdmin(c);
+    toast('Respuesta publicada');
+  };
+  caja.querySelectorAll('[data-adm-enviar]').forEach(b => b.addEventListener('click', () => enviar(b.dataset.admEnviar)));
+  caja.querySelectorAll('[data-adm-resp]').forEach(i => i.addEventListener('keydown', e => { if(e.key === 'Enter') enviar(i.dataset.admResp); }));
+  caja.querySelectorAll('[data-adm-borrar]').forEach(b => b.addEventListener('click', async () => {
+    if(!confirm('¿Borrar este comentario? Nadie lo volverá a ver.')) return;
+    const { error } = await adm('taller_admin_borrar_comentario', { p_id: b.dataset.admBorrar });
+    if(error){ toast('No se pudo borrar.'); return; }
+    ADM.coms.lista = ADM.coms.lista.filter(k => k.id !== b.dataset.admBorrar);
+    pintarComentariosAdmin(c);
+  }));
 }
 
 function editarClase(c, m){
