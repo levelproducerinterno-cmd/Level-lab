@@ -29,6 +29,7 @@
     --ventas:#d9a916;
     --produccion:#2f6fbf;
     --cobranza:#1a8f4c;
+    --mensual:#0f8b8d;
   }
   *{box-sizing:border-box;}
   html{overflow-x:hidden;}
@@ -209,6 +210,49 @@
   .color-chip{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--linea);}
   .color-chip.on{box-shadow:0 0 0 2px var(--negro);}
   #n-color{width:34px;height:34px;border:none;background:none;padding:0;}
+  /* Clientes mensuales */
+  .recorrido.cuatro{grid-template-columns:repeat(4,1fr);}
+  .ig-pregunta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#e6f3f3;border:1px solid #bfe0e0;border-radius:14px;padding:16px 18px;}
+  .ig-pregunta-ico{font-size:1.8rem;}
+  .ig-pregunta p{flex:1;min-width:240px;margin:0;font-size:0.92rem;line-height:1.5;}
+  .ig-pregunta-acc{display:flex;gap:8px;}
+  .ig-pregunta .btn{background:var(--mensual);}
+  .ig-pregunta .btn.ghost{background:transparent;color:var(--texto);}
+  .ig-barra{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+  .ig-barra .btn{background:var(--mensual);}
+  .ig-mes{display:flex;align-items:center;gap:10px;font-size:1.05rem;}
+  .ig-mes strong{min-width:150px;text-align:center;}
+  .ig-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+  .ig-stats > div{background:#fff;border:1px solid var(--linea);border-radius:12px;padding:12px 14px;}
+  .ig-stats span{display:block;font-size:0.72rem;font-weight:700;color:var(--gris);}
+  .ig-stats strong{font-size:1.25rem;}
+  .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;}
+  .ig-card{cursor:default;margin:0;}
+  .ig-head{display:flex;justify-content:space-between;gap:10px;cursor:pointer;}
+  .ig-monto{font-weight:800;font-size:1.05rem;white-space:nowrap;}
+  .ig-monto span{font-size:0.72rem;font-weight:600;color:var(--gris);}
+  .ig-chip{background:#e6f3f3;color:#0b6a6b;border-radius:5px;padding:2px 7px;font-weight:700;font-size:0.75rem;}
+  .ig-chip.ok{background:#d8efe1;color:#146b3a;}
+  .ig-chip.mal{background:#f7dcd5;color:#9c2a10;}
+  .ig-entregables{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+  .ig-ent{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:0.86rem;background:var(--hueso);border-radius:8px;padding:6px 8px;}
+  .ig-ent.listo{background:#d8efe1;}
+  .ig-cont{display:flex;align-items:center;gap:6px;}
+  .ig-cont button{width:28px;height:28px;border-radius:50%;border:1px solid var(--linea);background:#fff;font-weight:700;}
+  .ig-cont button:disabled{opacity:.35;}
+  .ig-aviso{margin-top:10px;font-size:0.8rem;background:#fff8e0;border-radius:8px;padding:8px 10px;line-height:1.4;}
+  .ig-aviso .link{margin-left:6px;}
+  .ig-cobrar{margin-top:14px;background:#fff;border:1px solid #bfe0e0;border-radius:12px;}
+  .ig-cobrar-tit{padding:12px 16px;font-size:0.9rem;}
+  .ig-tipo{display:grid;gap:10px;}
+  .ig-tipo button{text-align:left;background:#fff;border:1.5px solid var(--linea);border-radius:12px;padding:14px 16px;}
+  .ig-tipo button:hover{border-color:var(--negro);}
+  .ig-tipo strong{display:block;font-size:1rem;}
+  .ig-tipo span{font-size:0.82rem;color:var(--gris);}
+  @media (max-width:700px){
+    .recorrido.cuatro{grid-template-columns:repeat(2,1fr);}
+    .ig-stats{grid-template-columns:repeat(2,1fr);}
+  }
   /* Propuesta de venta */
   .cotizar.propuesta{background:#eef2f8;border-color:#cfdbec;color:#24528c;margin-top:6px;}
   .cotizar.propuesta:hover{background:#e0e9f5;}
@@ -440,7 +484,7 @@ function linkAlumno(token){ return location.origin + '/?t=' + token; }
 // ============================================================
 // ============ TABLERO (lo que ve cada alumno) ================
 // ============================================================
-let T = { token:null, pin:null, alumno:null, proyectos:[] };
+let T = { token:null, pin:null, alumno:null, proyectos:[], igualas:[] };
 
 // El PIN se recuerda solo en este dispositivo, para no escribirlo cada vez.
 const pinKey = token => 'otp_pin_' + token;
@@ -448,7 +492,7 @@ function leerPin(token){ try { return localStorage.getItem(pinKey(token)); } cat
 function recordarPin(token, pin){ try { pin ? localStorage.setItem(pinKey(token), pin) : localStorage.removeItem(pinKey(token)); } catch(e){} }
 
 async function abrirTablero(token, pin){
-  T = { token, pin: pin || leerPin(token), alumno:null, proyectos:[] };
+  T = { token, pin: pin || leerPin(token), alumno:null, proyectos:[], igualas:[] };
   app.innerHTML = '<div class="cargando">Cargando tu tablero…</div>';
   const { data, error } = await sb.rpc('taller_tablero', { p_token: token, p_pin: T.pin });
   if(error){
@@ -470,6 +514,7 @@ async function abrirTablero(token, pin){
   recordarPin(token, T.pin);
   ponerMoneda(T.alumno.moneda);
   T.proyectos = data.proyectos || [];
+  T.igualas = data.igualas || [];
   renderTablero();
 }
 
@@ -610,7 +655,7 @@ function renderTablero(destacarId){
       <button class="btn" id="b-sistema">${T.alumno.sistema ? 'Ver mi sistema interno' : 'Descubre tu sistema interno →'}</button>
     </div>
 
-    <nav class="recorrido">
+    <nav class="recorrido ${igualasActivas() ? 'cuatro' : ''}">
       <button class="paso" style="--c:var(--ventas)" data-ir="ventas">
         <div class="paso-num">1 · Ventas</div>
         <div class="paso-valor">${dinero(suma(enVentas, p => +p.monto_total))}</div>
@@ -623,9 +668,14 @@ function renderTablero(destacarId){
       </button>
       <button class="paso" style="--c:var(--cobranza)" data-ir="cobranza">
         <div class="paso-num">3 · Cobranza</div>
-        <div class="paso-valor">${dinero(suma(porCobrar, saldo))}</div>
+        <div class="paso-valor">${dinero(suma(porCobrar, saldo) + sumaPorCobrarIgualas())}</div>
         <div class="paso-desc">te deben</div>
       </button>
+      ${igualasActivas() ? `<button class="paso" style="--c:var(--mensual)" data-ir="mensuales">
+        <div class="paso-num">4 · Mensuales</div>
+        <div class="paso-valor">${dinero(T.igualas.filter(ig => igualaEnMes(ig, mesHoy())).reduce((a, ig) => a + (+ig.monto || 0), 0))}</div>
+        <div class="paso-desc">fijo al mes</div>
+      </button>` : ''}
     </nav>
 
     ${hayEjemplos ? `
@@ -635,6 +685,7 @@ function renderTablero(destacarId){
       </div>` : ''}
 
     ${SECCIONES.map(renderSeccion).join('')}
+    ${renderMensuales()}
 
     <details class="como">
       <summary>📖 Cómo usarlo</summary>
@@ -647,6 +698,7 @@ function renderTablero(destacarId){
         <li><strong>Te pagan el anticipo:</strong> clic en <em>Me pagó el anticipo</em> y escribe cuánto te dieron. Baja a Producción.</li>
         <li><strong>Avanzas:</strong> Preproducción → Producción → Edición. En edición, mueve la barra según el paso en el que vas. El avance se calcula solo.</li>
         <li><strong>Entregas:</strong> clic en <em>Entregado</em>. Baja a Cobranza y ves cuánto te deben.</li>
+        <li><strong>Clientes mensuales:</strong> si tienes igualas, actívalas en la sección 4. Cada mes marcas lo que entregas y quién ya te pagó; lo pendiente aparece en Cobranza.</li>
         <li><strong>Te liquidan:</strong> clic en <em>Me liquidaron</em>. Listo, pasa a tus cobrados.</li>
       </ol>
       <p class="ayuda" style="margin-bottom:14px;">Tip: en computadora también puedes arrastrar las tarjetas de una columna a otra.</p>
@@ -654,6 +706,7 @@ function renderTablero(destacarId){
     <p class="ayuda" style="text-align:center;margin-top:18px;">
       <a href="#" id="b-aviso" style="color:inherit;">🔒 Aviso de privacidad</a> ·
       <a href="#" id="b-salir" style="color:inherit;">Salir de este dispositivo</a> ·
+      ${!igualasActivas() && (T.alumno.negocio || {}).igualas === false ? '<a href="#" id="b-activar-igualas" style="color:inherit;">Activar clientes mensuales</a> ·' : ''}
       Moneda: <select id="b-moneda" class="moneda-sel">${MONEDAS.map(([c]) => `<option ${c === MONEDA ? 'selected' : ''}>${c}</option>`).join('')}</select>
     </p>
   `;
@@ -679,7 +732,21 @@ function renderTablero(destacarId){
   const bEj = document.getElementById('b-borrar-ejemplos');
   if(bEj) bEj.addEventListener('click', borrarEjemplos);
   conectarTarjetas();
+  conectarMensuales();
+  document.querySelectorAll('[data-pago-mes]').forEach(b => b.addEventListener('click', () => {
+    const [id, mes] = b.dataset.pagoMes.split('|'), ig = T.igualas.find(x => x.id === id);
+    const registro = JSON.parse(JSON.stringify(ig.registro || {})), hoy = new Date();
+    registro[mes] = Object.assign(registro[mes] || { e: igualaMes(ig, mes).e }, { pagado:true, fecha:`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}` });
+    guardarIguala({ id, registro }, { msg:'¡Cobrado! 🎉' });
+  }));
+  const bActIg = document.getElementById('b-activar-igualas');
+  if(bActIg) bActIg.addEventListener('click', e => { e.preventDefault(); activarIgualas(true); });
 
+  if(destacarId && destacarId.startsWith('sec-')){
+    const sec = document.getElementById(destacarId);
+    if(sec) sec.scrollIntoView({ behavior:'smooth' });
+    destacarId = null;
+  }
   if(destacarId){
     const el = app.querySelector(`.card[data-id="${destacarId}"]`);
     if(el){
@@ -715,6 +782,12 @@ function renderSeccion(s){
       <div class="seccion-head"><span class="chip-num">${s.num}</span><h2>${s.titulo}</h2></div>
       <p class="seccion-intro">${s.intro}</p>
       <div class="columnas ${s.etapas.length === 1 ? 'una' : ''}">${s.etapas.map(col).join('')}</div>
+      ${s.key === 'cobranza' && igualasPorCobrar().length ? `
+        <div class="ig-cobrar">
+          <div class="ig-cobrar-tit">🔁 Mensualidades por cobrar · <strong>${dinero(sumaPorCobrarIgualas())}</strong></div>
+          ${igualasPorCobrar().map(({ ig, mes }) => `<div class="cobrado-fila"><span><strong>${esc(ig.cliente)}</strong> · ${mesNombre(mes)}${igualaEstadoCobro(ig, mes) === 'atrasado' ? ' · <span style="color:var(--rojo);font-weight:600;">atrasado</span>' : ''}</span>
+            <span style="display:flex;gap:10px;align-items:center;">${dinero(ig.monto)}<button class="accion" data-pago-mes="${ig.id}|${mes}" style="flex:0 0 auto;padding:6px 10px;">Me pagó ✓</button></span></div>`).join('')}
+        </div>` : ''}
       ${s.key === 'cobranza' && pagados.length ? `
         <details class="cobrados">
           <summary>✅ Ya cobrados · ${pagados.length} ${pagados.length === 1 ? 'proyecto' : 'proyectos'} · ${dinero(pagados.reduce((a,p) => a + (+p.monto_total || 0), 0))}</summary>
@@ -776,7 +849,7 @@ function renderCard(p, s){
 function conectarTarjetas(){
   app.querySelectorAll('[data-nuevo]').forEach(b => b.addEventListener('click', () => abrirEditor(null)));
   app.querySelectorAll('[data-abrir]').forEach(f => f.addEventListener('click', () => abrirEditor(buscar(f.dataset.abrir))));
-  app.querySelectorAll('.card').forEach(card => {
+  app.querySelectorAll('.card:not(.ig-card)').forEach(card => {
     const p = buscar(card.dataset.id);
     card.addEventListener('click', e => { if(!e.target.closest('[data-stop]')) abrirEditor(p); });
     card.querySelectorAll('[data-mover]').forEach(b => b.addEventListener('click', () => moverA(p, b.dataset.mover)));
@@ -830,7 +903,7 @@ const buscar = id => T.proyectos.find(p => p.id === id);
 // Cambia la etapa. Al recibir anticipo pregunta cuánto, para que Cobranza sepa cuánto falta.
 function moverA(p, etapa){
   if(etapa === 'anticipo' && ETAPAS[p.etapa].seccion === 'ventas'){
-    preguntarAnticipo(p);
+    preguntarTipoCierre(p);
     return;
   }
   const cambios = { id:p.id, etapa };
@@ -2324,6 +2397,315 @@ async function prDescargarPDF(B, P, proy){
     doc.addImage(c.toDataURL('image/jpeg', .85), 'JPEG', 0, 0, 960, 540);
   });
   await siEntregar(doc.output('blob'), siArchivo('Propuesta ' + (proy.cliente || proy.nombre || ''), 'pdf'), 'application/pdf');
+}
+
+// ============================================================
+// ============ CLIENTES MENSUALES (igualas) ====================
+// ============================================================
+// Cada iguala se da de alta una vez; cada mes se arma solo con sus entregables y su cobro.
+// El registro por mes vive en iguala.registro = { 'AAAA-MM': { e:[entregados por renglón], pagado, fecha } }.
+const MES_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const mesHoy = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
+function mesSumar(clave, n){ const [a, m] = clave.split('-').map(Number); const d = new Date(a, m - 1 + n, 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; }
+function mesDiferencia(desde, hasta){ const [a1, m1] = desde.split('-').map(Number), [a2, m2] = hasta.split('-').map(Number); return (a2 - a1) * 12 + (m2 - m1); }
+const mesNombre = clave => { const [a, m] = clave.split('-').map(Number); return `${MES_NOMBRES[m - 1]} ${a}`; };
+const igualasActivas = () => (T.negocioIgualas = (T.alumno.negocio || {}).igualas === true || T.igualas.length > 0);
+
+// ¿Esta iguala corre en ese mes?
+function igualaEnMes(ig, mes){
+  if(mes < ig.inicio) return false;
+  if(ig.meses && mesDiferencia(ig.inicio, mes) >= ig.meses) return false;
+  if(!ig.activa) return !!(ig.registro || {})[mes];
+  return true;
+}
+function igualaMes(ig, mes){
+  const r = (ig.registro || {})[mes] || {};
+  const e = (ig.entregables || []).map((x, i) => Math.min(+x.cantidad || 0, +((r.e || [])[i]) || 0));
+  return { e, pagado: !!r.pagado, fecha: r.fecha || '' };
+}
+function igualaEstadoCobro(ig, mes){
+  const m = igualaMes(ig, mes);
+  if(m.pagado) return 'pagado';
+  const hoy = mesHoy();
+  if(mes < hoy) return 'atrasado';
+  if(mes === hoy && mes !== ig.inicio && new Date().getDate() > ig.dia_cobro) return 'atrasado';
+  return 'pendiente';
+}
+// Mensualidades sin pagar hasta el mes actual (para Cobranza)
+function igualasPorCobrar(){
+  const hoy = mesHoy(), lista = [];
+  T.igualas.forEach(ig => {
+    for(let mes = ig.inicio; mes <= hoy; mes = mesSumar(mes, 1)){
+      if(igualaEnMes(ig, mes) && !igualaMes(ig, mes).pagado) lista.push({ ig, mes });
+    }
+  });
+  return lista;
+}
+const sumaPorCobrarIgualas = () => igualasPorCobrar().reduce((a, x) => a + (+x.ig.monto || 0), 0);
+
+async function guardarIguala(cambios, opts = {}){
+  const previa = cambios.id ? { ...T.igualas.find(x => x.id === cambios.id) } : null;
+  if(previa) Object.assign(T.igualas.find(x => x.id === cambios.id), cambios);
+  if(previa && !opts.sinRender) renderTablero();
+  const { data, error } = await sb.rpc('taller_guardar_iguala', { p_token: T.token, p_pin: T.pin, p: cambios });
+  if(pinRechazado(data)) return null;
+  if(error){
+    console.error(error);
+    if(previa) Object.assign(T.igualas.find(x => x.id === cambios.id), previa);
+    renderTablero(); toast('No se pudo guardar. Revisa tu conexión.');
+    return null;
+  }
+  if(!previa) T.igualas.push(data); else Object.assign(T.igualas.find(x => x.id === data.id), data);
+  if(!opts.sinRender) renderTablero(opts.destacar ? 'ig-' + data.id : null);
+  if(opts.msg) toast(opts.msg);
+  return data;
+}
+
+async function activarIgualas(si){
+  const negocio = Object.assign({}, T.alumno.negocio || {}, { igualas: si });
+  T.alumno.negocio = negocio;
+  renderTablero(si ? 'sec-mensuales' : null);
+  const { data, error } = await sb.rpc('taller_guardar_negocio', { p_token: T.token, p_pin: T.pin, p_negocio: negocio });
+  if(pinRechazado(data)) return;
+  if(error) toast('No se pudo guardar tu preferencia.');
+}
+
+function renderMensuales(){
+  const negocio = T.alumno.negocio || {};
+  if(!igualasActivas()){
+    if(negocio.igualas === false) return '';
+    return `
+      <section class="seccion" id="sec-mensuales" style="--c:var(--mensual)">
+        <div class="ig-pregunta">
+          <span class="ig-pregunta-ico">🔁</span>
+          <p><strong>¿Tienes clientes mensuales (igualas)?</strong> Un cliente que te paga cada mes por un servicio fijo. Si los tienes, aquí llevas lo que les entregas y quién ya te pagó.</p>
+          <div class="ig-pregunta-acc"><button class="btn" data-igualas="si">Sí, tengo</button><button class="btn ghost" data-igualas="no">Por ahora no</button></div>
+        </div>
+      </section>`;
+  }
+  const mes = T.mesIguala || mesHoy();
+  const delMes = T.igualas.filter(ig => igualaEnMes(ig, mes));
+  const fijo = delMes.reduce((a, ig) => a + (+ig.monto || 0), 0);
+  const cobrado = delMes.filter(ig => igualaMes(ig, mes).pagado).reduce((a, ig) => a + (+ig.monto || 0), 0);
+  const pendientes = delMes.reduce((a, ig) => { const m = igualaMes(ig, mes); return a + (ig.entregables || []).reduce((b, x, i) => b + Math.max(0, (+x.cantidad || 0) - m.e[i]), 0); }, 0);
+  const pausadas = T.igualas.filter(ig => !ig.activa);
+  return `
+    <section class="seccion" id="sec-mensuales" style="--c:var(--mensual)">
+      <div class="seccion-head"><span class="chip-num">4</span><h2>Clientes mensuales</h2></div>
+      <p class="seccion-intro">Tus igualas: cada mes se arma solo con lo que le entregas a cada cliente y su cobro. Marca cada entregable conforme lo entregues y su pago cuando te depositen.</p>
+      <div class="ig-barra">
+        <div class="ig-mes">
+          <button class="icono" data-mes="-1" title="Mes anterior">‹</button>
+          <strong>${mesNombre(mes)}</strong>
+          <button class="icono" data-mes="1" title="Mes siguiente">›</button>
+          ${mes !== mesHoy() ? '<button class="link" data-mes="hoy">Ir a este mes</button>' : ''}
+        </div>
+        <button class="btn" data-nueva-iguala>+ Nueva iguala</button>
+      </div>
+      <div class="ig-stats">
+        <div><span>Ingreso fijo del mes</span><strong>${dinero(fijo)}</strong></div>
+        <div><span>Cobrado</span><strong style="color:var(--cobranza)">${dinero(cobrado)}</strong></div>
+        <div><span>Por cobrar</span><strong style="color:${fijo - cobrado > 0 ? 'var(--rojo)' : 'inherit'}">${dinero(fijo - cobrado)}</strong></div>
+        <div><span>Entregables pendientes</span><strong>${pendientes}</strong></div>
+      </div>
+      <div class="ig-grid">
+        ${delMes.length ? delMes.map(ig => renderIguala(ig, mes)).join('') : `<div class="col-vacia" style="grid-column:1/-1;">${T.igualas.length ? 'Ninguna iguala corre en este mes.' : 'Da de alta tu primer cliente mensual con <strong>+ Nueva iguala</strong>.'}</div>`}
+      </div>
+      ${pausadas.length ? `<details class="cobrados"><summary>⏸ Igualas terminadas o en pausa · ${pausadas.length}</summary>
+        ${pausadas.map(ig => `<div class="cobrado-fila" data-editar-iguala="${ig.id}"><span><strong>${esc(ig.cliente)}</strong> · ${esc(ig.servicio)}</span><span>${dinero(ig.monto)}/mes</span></div>`).join('')}</details>` : ''}
+    </section>`;
+}
+
+function renderIguala(ig, mes){
+  const m = igualaMes(ig, mes), estado = igualaEstadoCobro(ig, mes);
+  const total = (ig.entregables || []).reduce((a, x) => a + (+x.cantidad || 0), 0);
+  const hechos = m.e.reduce((a, b) => a + b, 0);
+  const pct = total ? Math.round(hechos / total * 100) : 0;
+  const nMes = mesDiferencia(ig.inicio, mes) + 1;
+  const ultimo = ig.meses && nMes === ig.meses;
+  const revisar = mes === mesHoy() && mesDiferencia(ig.precio_desde || ig.inicio, mes) >= 6;
+  const chip = { pagado:'<span class="ig-chip ok">✓ Pagado</span>', pendiente:`<span class="ig-chip">Cobro el día ${ig.dia_cobro}</span>`, atrasado:`<span class="ig-chip mal">Atrasado · día ${ig.dia_cobro}</span>` }[estado];
+  return `
+    <div class="card ig-card" data-id="ig-${ig.id}">
+      <div class="ig-head" data-editar-iguala="${ig.id}">
+        <div><div class="card-nombre">${esc(ig.cliente) || 'Sin nombre'}</div><div class="card-cliente">${esc(ig.servicio)}</div></div>
+        <div class="ig-monto">${dinero(ig.monto)}<span>/mes</span></div>
+      </div>
+      <div class="card-meta">${chip}<span class="fecha">Mes ${nMes}${ig.meses ? ' de ' + ig.meses : ''}</span></div>
+      ${total ? `
+        <div class="barra" style="--c:var(--mensual)"><div style="width:${pct}%"></div></div>
+        <div class="barra-label"><span>Entregado este mes</span><strong>${hechos} de ${total}</strong></div>
+        <div class="ig-entregables">${(ig.entregables || []).map((x, i) => `
+          <div class="ig-ent ${m.e[i] >= +x.cantidad ? 'listo' : ''}">
+            <span>${esc(x.nombre)}</span>
+            <div class="ig-cont">
+              <button data-ent="${ig.id}|${i}|-1" ${m.e[i] <= 0 ? 'disabled' : ''}>−</button>
+              <strong>${m.e[i]}/${+x.cantidad || 0}</strong>
+              <button data-ent="${ig.id}|${i}|1" ${m.e[i] >= +x.cantidad ? 'disabled' : ''}>+</button>
+            </div>
+          </div>`).join('')}</div>` : ''}
+      ${ultimo ? `<div class="ig-aviso">📅 Último mes del contrato. ¿Renuevas?<button class="link" data-renovar="${ig.id}">Renovar</button></div>` : ''}
+      ${revisar ? `<div class="ig-aviso">💡 Llevas ${mesDiferencia(ig.precio_desde || ig.inicio, mes)} meses con el mismo precio. Revisa si es momento de ajustarlo.<button class="link" data-revisado="${ig.id}">Ya lo revisé</button></div>` : ''}
+      <div class="card-acciones">
+        ${m.pagado
+          ? `<button class="accion sec" data-pago="${ig.id}">✓ Pagado${m.fecha ? ' el ' + fechaBonita(m.fecha) : ''} · deshacer</button>`
+          : `<button class="accion" data-pago="${ig.id}">Me pagó ${MES_NOMBRES[+mes.split('-')[1] - 1].toLowerCase()} ✓</button>`}
+      </div>
+    </div>`;
+}
+
+function conectarMensuales(){
+  const sec = document.getElementById('sec-mensuales');
+  if(!sec) return;
+  sec.addEventListener('click', e => {
+    const t = e.target.closest('button, [data-editar-iguala]');
+    if(!t) return;
+    const d = t.dataset, mes = T.mesIguala || mesHoy();
+    if(d.igualas){ activarIgualas(d.igualas === 'si'); if(d.igualas === 'no') toast('Listo. Si algún día tienes, actívalo abajo del tablero.'); }
+    if(d.mes){ T.mesIguala = d.mes === 'hoy' ? mesHoy() : mesSumar(mes, +d.mes); renderTablero('sec-mensuales'); }
+    if(d.nuevaIguala !== undefined) abrirEditorIguala(null);
+    if(d.editarIguala) abrirEditorIguala(T.igualas.find(x => x.id === d.editarIguala));
+    if(d.ent){
+      const [id, i, delta] = d.ent.split('|'), ig = T.igualas.find(x => x.id === id);
+      const registro = JSON.parse(JSON.stringify(ig.registro || {})), m = igualaMes(ig, mes);
+      m.e[+i] = Math.max(0, Math.min(+ig.entregables[+i].cantidad || 0, m.e[+i] + +delta));
+      registro[mes] = Object.assign(registro[mes] || {}, { e: m.e });
+      guardarIguala({ id, registro });
+    }
+    if(d.pago){
+      const ig = T.igualas.find(x => x.id === d.pago);
+      const registro = JSON.parse(JSON.stringify(ig.registro || {})), m = igualaMes(ig, mes);
+      const hoy = new Date();
+      registro[mes] = Object.assign(registro[mes] || { e: m.e }, m.pagado ? { pagado:false, fecha:'' } : { pagado:true, fecha:`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}` });
+      guardarIguala({ id: ig.id, registro }, { msg: m.pagado ? 'Pago desmarcado' : '¡Cobrado! 🎉' });
+    }
+    if(d.renovar){
+      const ig = T.igualas.find(x => x.id === d.renovar);
+      const n = prompt('¿Por cuántos meses más renuevas? (deja vacío si ya no tiene fecha de fin)', '6');
+      if(n === null) return;
+      guardarIguala({ id: ig.id, meses: n.trim() ? String(ig.meses + (parseInt(n, 10) || 0)) : '' }, { msg: '¡Iguala renovada!' });
+    }
+    if(d.revisado) guardarIguala({ id: d.revisado, precio_desde: mesHoy() });
+  });
+}
+
+function abrirEditorIguala(ig, desde){
+  const nueva = !ig;
+  const d = ig ? JSON.parse(JSON.stringify(ig)) : {
+    cliente: desde ? desde.cliente : '', servicio: desde ? (desde.nombre || desde.tipo || '') : '',
+    monto: desde ? desde.monto_total : '', dia_cobro: 1, inicio: mesHoy(), meses: 6,
+    entregables: [{ nombre:'Reels', cantidad:8 }], activa: true
+  };
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  document.body.appendChild(bg);
+  const cerrar = () => bg.remove();
+  const filas = () => d.entregables.map((x, i) => `
+    <div class="cot-fila">
+      <input data-ent-nom="${i}" value="${esc(x.nombre)}" placeholder="Ej. Reels, posts, fotos">
+      <label class="cot-campo cot-n"><span class="cot-mini">Cantidad</span><input data-ent-cant="${i}" type="number" inputmode="numeric" min="0" value="${x.cantidad}"></label>
+      <button type="button" class="cot-quitar" data-quitar-ent="${i}">✕</button>
+    </div>`).join('');
+  const render = () => {
+    bg.innerHTML = `
+      <div class="modal">
+        <h3>${nueva ? '🔁 Nueva iguala' : 'Editar iguala'}</h3>
+        ${desde ? '<p class="ayuda" style="margin:-8px 0 14px;font-size:0.85rem;">Llenamos los datos con tu prospecto. Revísalos y guarda.</p>' : ''}
+        <div class="campo"><label>Cliente</label><input id="i-cliente" value="${esc(d.cliente)}" placeholder="Ej. Cafetería Aroma"></div>
+        <div class="campo"><label>Servicio</label><input id="i-servicio" value="${esc(d.servicio)}" placeholder="Ej. Contenido para redes"></div>
+        <div class="fila2">
+          <div class="campo"><label>Monto mensual</label><input id="i-monto" type="number" inputmode="decimal" value="${d.monto}" placeholder="0"></div>
+          <div class="campo"><label>Día de cobro</label><input id="i-dia" type="number" inputmode="numeric" min="1" max="31" value="${d.dia_cobro}"></div>
+        </div>
+        <div class="fila2">
+          <div class="campo"><label>Empieza en</label><input id="i-inicio" type="month" value="${d.inicio}"></div>
+          <div class="campo"><label>Duración</label><select id="i-meses">
+            ${[['', 'Sin fecha de fin'], [3, '3 meses'], [6, '6 meses'], [12, '12 meses']].map(([v, t]) => `<option value="${v}" ${String(d.meses || '') === String(v) ? 'selected' : ''}>${t}</option>`).join('')}
+            ${d.meses && ![3, 6, 12].includes(+d.meses) ? `<option value="${d.meses}" selected>${d.meses} meses</option>` : ''}
+          </select></div>
+        </div>
+        <div class="campo"><label>Qué le entregas cada mes</label>
+          <div id="i-ents">${filas()}</div>
+          <button type="button" class="col-agregar" data-agregar-ent>+ Agregar entregable</button></div>
+        ${nueva ? '<label class="cot-check"><input type="checkbox" id="i-previos" checked> Si empezó antes de este mes, ya me pagaron los meses anteriores</label>' : `<label class="cot-check"><input type="checkbox" id="i-activa" ${d.activa ? 'checked' : ''}> Iguala activa (desmárcala si terminó o está en pausa)</label>`}
+        <div class="modal-pie">
+          ${nueva ? '' : '<button class="btn peligro" data-borrar>Borrar</button>'}
+          <div class="der"><button class="btn ghost" data-cerrar>Cancelar</button><button class="btn" data-guardar>Guardar</button></div>
+        </div>
+      </div>`;
+  };
+  render();
+  const leer = () => {
+    const $ = id => bg.querySelector('#' + id);
+    d.cliente = $('i-cliente').value.trim(); d.servicio = $('i-servicio').value.trim();
+    d.monto = $('i-monto').value; d.dia_cobro = Math.min(31, Math.max(1, parseInt($('i-dia').value, 10) || 1));
+    d.inicio = $('i-inicio').value || mesHoy(); d.meses = $('i-meses').value;
+    if($('i-activa')) d.activa = $('i-activa').checked;
+  };
+  bg.addEventListener('input', e => {
+    const t = e.target;
+    if(t.dataset.entNom !== undefined) d.entregables[+t.dataset.entNom].nombre = t.value;
+    if(t.dataset.entCant !== undefined) d.entregables[+t.dataset.entCant].cantidad = Math.max(0, parseInt(t.value, 10) || 0);
+  });
+  bg.addEventListener('click', async e => {
+    if(e.target === bg){ cerrar(); return; }
+    const t = e.target.closest('button'); if(!t) return;
+    if(t.dataset.cerrar !== undefined) return cerrar();
+    if(t.dataset.agregarEnt !== undefined){ leer(); d.entregables.push({ nombre:'', cantidad:1 }); render(); }
+    if(t.dataset.quitarEnt !== undefined){ leer(); d.entregables.splice(+t.dataset.quitarEnt, 1); render(); }
+    if(t.dataset.borrar !== undefined){
+      if(!confirm(`¿Borrar la iguala de ${ig.cliente}? Se pierde su historial de cobros. Si solo terminó, mejor desmarca "Iguala activa".`)) return;
+      cerrar();
+      const { data, error } = await sb.rpc('taller_borrar_iguala', { p_token: T.token, p_pin: T.pin, p_id: ig.id });
+      if(pinRechazado(data)) return;
+      if(error){ toast('No se pudo borrar.'); return; }
+      T.igualas = T.igualas.filter(x => x.id !== ig.id); renderTablero();
+    }
+    if(t.dataset.guardar !== undefined){
+      leer();
+      if(!d.cliente){ toast('Escribe el nombre del cliente'); return; }
+      const datos = { cliente: d.cliente, servicio: d.servicio, monto: +d.monto || 0, dia_cobro: d.dia_cobro, inicio: d.inicio,
+        meses: d.meses ? String(d.meses) : '', entregables: d.entregables.filter(x => x.nombre.trim()).map(x => ({ nombre: x.nombre.trim(), cantidad: +x.cantidad || 0 })), activa: d.activa };
+      if(nueva && bg.querySelector('#i-previos').checked && datos.inicio < mesHoy()){
+        datos.registro = {};
+        for(let m = datos.inicio; m < mesHoy(); m = mesSumar(m, 1)) datos.registro[m] = { pagado:true, fecha:'', e: datos.entregables.map(x => x.cantidad) };
+      }
+      cerrar();
+      if(nueva){
+        if(!(T.alumno.negocio || {}).igualas) await activarIgualas(true);
+        const r = await guardarIguala(datos, { destacar:true, msg:'Iguala creada 🔁' });
+        if(r && desde){
+          const { data } = await sb.rpc('taller_borrar_proyecto', { p_token: T.token, p_pin: T.pin, p_id: desde.id });
+          if(!pinRechazado(data)){ T.proyectos = T.proyectos.filter(x => x.id !== desde.id); renderTablero('ig-' + r.id); }
+        }
+      } else guardarIguala({ id: ig.id, ...datos }, { msg:'Guardado' });
+    }
+  });
+}
+
+// Al cerrar un prospecto: ¿proyecto único o iguala mensual?
+function preguntarTipoCierre(p){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal" style="max-width:440px;">
+      <h3>🎉 ¡Cerraste ${esc(p.cliente || p.nombre)}!</h3>
+      <p class="ayuda" style="margin:-6px 0 16px;font-size:0.88rem;">¿Qué tipo de trabajo es?</p>
+      <div class="ig-tipo">
+        <button data-tipo="unico"><strong>Proyecto único</strong><span>Se hace una vez: pasa a Producción</span></button>
+        <button data-tipo="iguala"><strong>Iguala mensual</strong><span>Te paga cada mes: pasa a Clientes mensuales</span></button>
+      </div>
+      <div class="modal-pie"><div class="der"><button class="btn ghost" data-cerrar>Cancelar</button></div></div>
+    </div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', e => {
+    const t = e.target.closest('button');
+    if(e.target === bg || (t && t.dataset.cerrar !== undefined)){ bg.remove(); return; }
+    if(!t) return;
+    bg.remove();
+    if(t.dataset.tipo === 'unico') preguntarAnticipo(p);
+    if(t.dataset.tipo === 'iguala') abrirEditorIguala(null, p);
+  });
 }
 
 function abrirEditor(p){
