@@ -209,6 +209,48 @@
   .color-chip{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--linea);}
   .color-chip.on{box-shadow:0 0 0 2px var(--negro);}
   #n-color{width:34px;height:34px;border:none;background:none;padding:0;}
+  /* Propuesta de venta */
+  .cotizar.propuesta{background:#eef2f8;border-color:#cfdbec;color:#24528c;margin-top:6px;}
+  .cotizar.propuesta:hover{background:#e0e9f5;}
+  .pr-bg{position:fixed;inset:0;z-index:120;background:var(--hueso);display:flex;flex-direction:column;}
+  .pr-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 20px;background:#fff;border-bottom:1px solid var(--linea);}
+  .pr-top-acc{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .pr-canva{font-size:0.8rem;color:var(--gris);font-weight:600;}
+  .pr-cuerpo{flex:1;display:flex;min-height:0;}
+  .pr-nav{width:230px;flex:0 0 auto;overflow:auto;padding:14px 10px;border-right:1px solid var(--linea);background:#faf8f4;}
+  .pr-nav button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:transparent;border:none;border-radius:9px;padding:9px 10px;font-size:0.86rem;font-weight:600;color:var(--texto);}
+  .pr-nav button span{width:22px;height:22px;border-radius:50%;background:var(--hueso2);display:inline-flex;align-items:center;justify-content:center;font-size:0.72rem;flex:0 0 auto;}
+  .pr-nav button.on{background:var(--negro);color:#fff;}
+  .pr-nav button.on span{background:#fff;color:var(--negro);}
+  .pr-nav button.off{color:#b5ae9f;text-decoration:line-through;}
+  .pr-editor{flex:1;overflow:auto;padding:20px 24px 40px;}
+  .pr-editor-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .pr-editor-head h3{margin:0;font-size:1.3rem;}
+  .pr-toggle{font-size:0.85rem;font-weight:600;display:flex;gap:6px;align-items:center;}
+  .pr-form{max-width:760px;}
+  .pr-ayuda{font-size:0.88rem;color:#5b574f;margin:0 0 12px;}
+  .pr-ayuda a{color:inherit;font-weight:700;}
+  .pr-base{font-size:0.66rem;background:#eef2f8;color:#24528c;border-radius:5px;padding:1px 6px;font-weight:700;margin-left:4px;}
+  .pr-grupo{border:1px solid var(--linea);border-radius:12px;padding:12px;margin-bottom:12px;background:#fff;}
+  .pr-fotos{display:flex;gap:10px;flex-wrap:wrap;}
+  .pr-foto{display:flex;flex-direction:column;gap:6px;align-items:flex-start;}
+  .pr-foto-prev{width:120px;height:120px;border:1.5px dashed #d0c9bb;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff;}
+  .pr-foto-prev img{width:100%;height:100%;object-fit:cover;}
+  .pr-foto-prev span{font-size:0.75rem;color:#aaa49a;}
+  .pr-subir{padding:6px 12px;font-size:0.78rem;}
+  .pr-mas{align-self:center;height:fit-content;}
+  .pr-quitar{background:none;border:none;color:var(--gris);font-size:0.75rem;text-decoration:underline;padding:0;}
+  .pr-preview{margin:18px 0 0;max-width:960px;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);}
+  .pr-preview canvas{width:100%;height:auto;display:block;}
+  .pr-preview.apagado{opacity:.35;}
+  .pr-pie{display:flex;justify-content:space-between;max-width:960px;margin-top:16px;}
+  @media (max-width:800px){
+    .pr-cuerpo{flex-direction:column;}
+    .pr-nav{width:auto;display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--linea);padding:8px;}
+    .pr-nav button{width:auto;white-space:nowrap;}
+    .pr-editor{padding:16px;}
+    .pr-canva{order:3;width:100%;}
+  }
   /* Sistema interno */
   .si-banner{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#f3ede3;border:1px solid #e2d8c6;border-radius:14px;padding:14px 18px;margin:4px 0 6px;}
   .si-banner p{flex:1;min-width:220px;margin:0;font-family:'Cormorant Garamond',serif;font-size:1.25rem;line-height:1.35;color:#2b2620;}
@@ -311,7 +353,7 @@ const app = document.getElementById('app');
 // ============ Etapas del recorrido ============
 const SECCIONES = [
   { key:'ventas', num:1, titulo:'Ventas', color:'var(--ventas)',
-    intro:'Tus prospectos y cotizaciones. Si no cierras, aquí ves cuánto dinero se quedó en la mesa. Si no cerraste, márcalo como <em>Perdido</em>: no lo borres, ese número te enseña.',
+    intro:'Tus prospectos y cotizaciones. Si no cierras, aquí ves cuánto dinero se quedó en la mesa. Si no cerraste, márcalo como <em>Perdido</em>: no lo borres, ese número te enseña.<br><strong>¿Tienes una propuesta en puerta?</strong> Ármala aquí: en la tarjeta del prospecto da clic en <em>📊 Propuesta</em> y descárgala en PDF.',
     etapas:['prospecto','cotizacion','perdido'] },
   { key:'produccion', num:2, titulo:'Producción', color:'var(--produccion)',
     intro:'Tus proyectos activos y qué tan avanzado va cada uno. Preproducción → Producción (grabando) → Edición. Ya en edición, mueve la barra para marcar en qué paso vas.',
@@ -600,6 +642,7 @@ function renderTablero(destacarId){
         <li><strong>Te piden una cotización:</strong> da clic en <em>+ Nuevo proyecto</em>. Aparece en Ventas como Prospecto.</li>
         <li><strong>Cotizas:</strong> en la tarjeta, clic en <em>🧮 Cotizar</em>. Anota quién va, cuánto le pagas a cada quien, tu pago, edición y gastos: el sistema te dice cuánto te cuesta y cuánto cobrar. Puedes armar hasta 3 paquetes.</li>
         <li><strong>Tu marca:</strong> en <em>🏷️ Mi negocio</em> sube tu logo y tus datos una sola vez. Desde la cotización descargas el PDF con tu marca, listo para mandar.</li>
+        <li><strong>Tu propuesta:</strong> con <em>📊 Propuesta</em> armas tu presentación slide por slide (lo de tu negocio se llena una sola vez) y la descargas en PDF.</li>
         <li><strong>Mandas la cotización:</strong> clic en <em>Envié la cotización</em>.</li>
         <li><strong>Te pagan el anticipo:</strong> clic en <em>Me pagó el anticipo</em> y escribe cuánto te dieron. Baja a Producción.</li>
         <li><strong>Avanzas:</strong> Preproducción → Producción → Edición. En edición, mueve la barra según el paso en el que vas. El avance se calcula solo.</li>
@@ -719,8 +762,9 @@ function renderCard(p, s){
       ${s.key === 'ventas' && p.etapa !== 'perdido' ? `
         <div class="cotizar-fila" data-stop>
           <button class="cotizar" data-cotizar>${p.cotizacion ? `🧮 Ver cotización${p.cotizacion.paquetes.length > 1 ? ' · ' + p.cotizacion.paquetes.length + ' paquetes' : ''}` : '🧮 Cotizar'}</button>
-          ${p.cotizacion ? '<button class="cotizar pdf" data-pdf-card title="Descargar PDF">📄 PDF</button>' : ''}
-        </div>` : ''}
+          ${p.cotizacion ? '<button class="cotizar pdf" data-pdf-card title="Descargar PDF de la cotización">📄 PDF</button>' : ''}
+        </div>
+        <button class="cotizar propuesta" data-stop data-propuesta>📊 ${p.propuesta ? 'Ver propuesta' : 'Propuesta'}</button>` : ''}
       ${sig ? `
         <div class="card-acciones" data-stop>
           <button class="accion" data-mover="${sig.a}">${sig.txt}</button>
@@ -738,6 +782,8 @@ function conectarTarjetas(){
     card.querySelectorAll('[data-mover]').forEach(b => b.addEventListener('click', () => moverA(p, b.dataset.mover)));
     const bCot = card.querySelector('[data-cotizar]');
     if(bCot) bCot.addEventListener('click', () => abrirCotizador(p));
+    const bProp = card.querySelector('[data-propuesta]');
+    if(bProp) bProp.addEventListener('click', () => abrirPropuesta(p));
     const bPdf = card.querySelector('[data-pdf-card]');
     if(bPdf) bPdf.addEventListener('click', async () => {
       bPdf.disabled = true;
@@ -1834,6 +1880,450 @@ async function siEntregar(blob, nombre, tipo){
   const url = URL.createObjectURL(blob), a = document.createElement('a');
   a.href = url; a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+// ============================================================
+// ============ PROPUESTA DE VENTA (presentación) ===============
+// ============================================================
+// Mismo recorrido que la plantilla de Canva. Lo que no cambia entre clientes (quiénes somos,
+// marcas, proceso, metodología, datos bancarios) se guarda en "Mi negocio" y se reutiliza;
+// lo del cliente (logros, problema, solución) se guarda en el proyecto. Precios: del cotizador.
+const PLANTILLA_CANVA = 'https://canva.link/ps556ffqrcbnjtf';
+const PR_W = 1920, PR_H = 1080;
+const PR_SLIDES = [
+  { k:'portada', t:'Portada' }, { k:'quienes', t:'Quiénes somos' }, { k:'marcas', t:'Marcas' },
+  { k:'logros', t:'Logros del cliente' }, { k:'problema', t:'El problema' }, { k:'solucion', t:'La solución' },
+  { k:'transicion', t:'Todo tiene solución' }, { k:'resultados', t:'Resultados' }, { k:'proceso', t:'Cómo trabajamos' },
+  { k:'metodologia', t:'Metodología' }, { k:'inversion', t:'Inversión' }, { k:'empezamos', t:'Empezamos' }
+];
+const PR_BASE = () => ({
+  giro:'', ciudad:'', quienes_titulo:'', quienes_texto:'', frames:['', '', ''], marcas:[],
+  resultados:[{ nombre:'', antes:'', despues:'' }, { nombre:'', antes:'', despues:'' }],
+  proceso:[
+    { texto:'Nos reunimos para conocer tu marca y tu proyecto', img:'' },
+    { texto:'Producimos desde la esencia de tu marca', img:'' },
+    { texto:'Entregamos, medimos resultados y mejoramos', img:'' }],
+  metodologia:[
+    { titulo:'Guiones', texto:'Creación de guiones e ideas para tus videos.' },
+    { titulo:'Grabación', texto:'Grabamos en las fechas acordadas.' },
+    { titulo:'Edición', texto:'Musicalización, sound fx, cortes y color.' },
+    { titulo:'Entrega', texto:'Recibes tus videos listos para publicar.' }],
+  pasos:'Realizar el pago del anticipo\nAgendar junta de planeación\nDefinir guiones\nAgendar fechas de grabación\nProducir',
+  banco:{ titular:'', banco:'', clabe:'', cuenta:'' }
+});
+const PR_PROY = p => ({ logros:['', '', ''], cliente_img:'', problema:'', problema_img:'', solucion:'', apagados:['resultados'] });
+
+// ---------- Imágenes (comprimidas y guardadas con el PIN del alumno) ----------
+const PR_IMG = {};   // id -> HTMLImageElement
+function prCargarImg(src){ return new Promise((ok, mal) => { const i = new Image(); i.onload = () => ok(i); i.onerror = mal; i.src = src; }); }
+async function prTraerImagenes(ids){
+  const faltan = [...new Set(ids.filter(id => id && !PR_IMG[id]))];
+  if(!faltan.length) return;
+  const { data, error } = await sb.rpc('taller_imagenes', { p_token: T.token, p_pin: T.pin, p_ids: faltan });
+  if(error || !data || data.error) return;
+  await Promise.all(Object.entries(data).map(async ([id, src]) => { try { PR_IMG[id] = await prCargarImg(src); } catch(e){} }));
+}
+function prReducir(file, max, png){
+  return new Promise((ok, mal) => {
+    const lector = new FileReader();
+    lector.onerror = mal;
+    lector.onload = async () => {
+      try {
+        const img = await prCargarImg(lector.result);
+        let f = Math.min(1, max / Math.max(img.width, img.height)), c, url;
+        do {
+          c = document.createElement('canvas'); c.width = Math.round(img.width * f); c.height = Math.round(img.height * f);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          url = png ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', .82);
+          f *= .8;
+        } while(url.length > 650000 && f > .1);
+        ok(url);
+      } catch(e){ mal(e); }
+    };
+    lector.readAsDataURL(file);
+  });
+}
+async function prSubir(file, esLogo){
+  const url = await prReducir(file, esLogo ? 700 : 1500, esLogo && /png|svg|webp|gif/.test(file.type));
+  const { data, error } = await sb.rpc('taller_subir_imagen', { p_token: T.token, p_pin: T.pin, p_data: url });
+  if(pinRechazado(data)) throw new Error('pin');
+  if(error || !data || !data.id) throw new Error('subir');
+  PR_IMG[data.id] = await prCargarImg(url);
+  return data.id;
+}
+
+// ---------- Dibujo de cada slide ----------
+const PR_PAPEL = '#f1eee9', PR_TINTA = '#141210', PR_GRIS = '#a59f95';
+function prMarca(){ const c = (T.alumno.negocio || {}).color; return c && c !== '#0a0908' ? c : '#b30000'; }
+function prTexto(ctx, txt, x, y, ancho, alto, alinear, mayus){
+  return siTexto(ctx, mayus ? String(txt).toUpperCase() : txt, x, y, ancho, alto, alinear);
+}
+function prFoto(ctx, id, x, y, w, h, etiqueta, contener){
+  const img = PR_IMG[id];
+  ctx.save();
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, contener ? 0 : 12);
+  if(img){
+    ctx.clip();
+    const r = contener ? Math.min(w / img.width, h / img.height) : Math.max(w / img.width, h / img.height);
+    ctx.drawImage(img, x + (w - img.width * r) / 2, y + (h - img.height * r) / 2, img.width * r, img.height * r);
+  } else {
+    ctx.fillStyle = 'rgba(20,18,16,.05)'; ctx.fill();
+    ctx.setLineDash([10, 8]); ctx.strokeStyle = '#c9c3b8'; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = PR_GRIS; ctx.font = '500 20px Montserrat'; ctx.textAlign = 'center';
+    prTexto(ctx, etiqueta || 'Agrega una imagen', x + w / 2, y + h / 2, w - 40, 26, 'center', true);
+  }
+  ctx.restore();
+}
+function prLogo(ctx, cx, y, maxW, maxH){
+  const N = T.alumno.negocio || {};
+  if(N.logo && PR_IMG.__logo){
+    const img = PR_IMG.__logo, r = Math.min(maxW / img.width, maxH / img.height);
+    ctx.drawImage(img, cx - img.width * r / 2, y, img.width * r, img.height * r);
+  } else {
+    ctx.fillStyle = N.nombre ? PR_TINTA : PR_GRIS; ctx.textAlign = 'center';
+    ctx.font = `600 ${Math.round(maxH * .55)}px "Cormorant Garamond"`;
+    ctx.fillText(N.nombre || 'TU LOGO', cx, y + maxH * .7);
+  }
+}
+function prTitulo(ctx, txt, x, y, alinear, tam, color){
+  ctx.fillStyle = color || PR_TINTA; ctx.font = `600 ${tam || 56}px "Cormorant Garamond"`;
+  ctx.letterSpacing = '5px'; ctx.textAlign = alinear || 'center';
+  ctx.fillText(String(txt).toUpperCase(), x, y);
+  ctx.letterSpacing = '0px';
+}
+function prCuerpo(ctx, txt, x, y, ancho, alinear, tam, vacio){
+  ctx.fillStyle = txt ? PR_TINTA : PR_GRIS; ctx.font = `500 ${tam || 26}px Montserrat`; ctx.letterSpacing = '1px';
+  const fin = prTexto(ctx, txt || vacio || '', x, y, ancho, (tam || 26) * 1.35, alinear || 'center', true);
+  ctx.letterSpacing = '0px';
+  return fin;
+}
+function prLinea(ctx, x1, x2, y){ ctx.strokeStyle = prMarca(); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke(); }
+function prPunto(ctx, x, y){ ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2); ctx.fillStyle = PR_TINTA; ctx.fill(); }
+
+function prDibujar(ctx, k, B, P, proy){
+  ctx.fillStyle = PR_PAPEL; ctx.fillRect(0, 0, PR_W, PR_H);
+  siGrano(ctx, PR_W, PR_H, siRandom('slide' + k));
+  ctx.textBaseline = 'alphabetic';
+  const cliente = proy.cliente || 'tu cliente';
+  if(k !== 'portada' && k !== 'inversion' && k !== 'empezamos') prLogo(ctx, PR_W / 2, 60, 260, 90);
+  if(k === 'portada'){
+    prLogo(ctx, PR_W / 2, 380, 760, 300);
+    ctx.font = '600 32px "Cormorant Garamond"'; ctx.letterSpacing = '3px'; ctx.fillStyle = prMarca();
+    ctx.textAlign = 'left'; ctx.fillText((B.giro || 'Tu giro').toUpperCase(), 110, 990);
+    ctx.textAlign = 'right'; ctx.fillText((B.ciudad || 'Tu ciudad').toUpperCase(), PR_W - 110, 990);
+    ctx.letterSpacing = '0px';
+  }
+  else if(k === 'quienes'){
+    prTitulo(ctx, B.quienes_titulo || 'Somos [qué eres en pocas palabras].', PR_W / 2, 250, 'center', 56, B.quienes_titulo ? PR_TINTA : PR_GRIS);
+    [0, 1, 2].forEach(i => prFoto(ctx, B.frames[i], 314 + i * 440, 290, 420, 540, 'Frame de tu mejor video'));
+    prCuerpo(ctx, B.quienes_texto, PR_W / 2, 900, 1300, 'center', 26, '[Qué haces y para quién, en una línea]');
+    prLinea(ctx, 314, 1606, 975);
+  }
+  else if(k === 'marcas'){
+    prTitulo(ctx, 'Marcas que han confiado en nosotros', PR_W / 2, 330, 'center', 46);
+    const logos = B.marcas.length ? B.marcas : ['', '', '', '', ''];
+    const porFila = Math.min(6, logos.length), bw = 230, bh = 130, gap = 40;
+    logos.forEach((id, i) => {
+      const fila = Math.floor(i / porFila), col = i % porFila;
+      const enFila = Math.min(porFila, logos.length - fila * porFila);
+      const x0 = (PR_W - (enFila * bw + (enFila - 1) * gap)) / 2;
+      prFoto(ctx, id, x0 + col * (bw + gap), 440 + fila * (bh + 50), bw, bh, 'Logo', true);
+    });
+  }
+  else if(k === 'logros'){
+    prTitulo(ctx, 'Logros', 363, 430, 'left');
+    P.logros.forEach((l, i) => {
+      prPunto(ctx, 375, 490 + i * 56);
+      ctx.fillStyle = l ? PR_TINTA : PR_GRIS; ctx.font = '600 24px Montserrat'; ctx.letterSpacing = '1px'; ctx.textAlign = 'left';
+      ctx.fillText((l || `Logro ${i + 1} de ${cliente}`).toUpperCase(), 400, 499 + i * 56); ctx.letterSpacing = '0px';
+    });
+    prFoto(ctx, P.cliente_img, 1173, 260, 420, 560, 'Foto de tu cliente');
+    prLinea(ctx, 349, 1571, 972);
+  }
+  else if(k === 'problema'){
+    prTitulo(ctx, 'Un solo problema', 420, 520, 'left', 46);
+    const fin = prCuerpo(ctx, P.problema, 420, 575, 520, 'left', 26, '[El problema en una frase]');
+    prLinea(ctx, 420, 940, fin + 10);
+    prFoto(ctx, P.problema_img, 1060, 190, 500, 700, 'Captura que muestre el problema');
+  }
+  else if(k === 'solucion' || k === 'transicion'){
+    const txt = k === 'transicion' ? 'Todo tiene solución' : (P.solucion || `Comunicar quién es ${cliente}`);
+    prLinea(ctx, 752, 1168, 506);
+    ctx.fillStyle = PR_TINTA; ctx.font = '600 52px "Cormorant Garamond"'; ctx.letterSpacing = '5px';
+    prTexto(ctx, txt, PR_W / 2, 580, 760, 64, 'center', true); ctx.letterSpacing = '0px';
+  }
+  else if(k === 'resultados'){
+    prTitulo(ctx, 'Resultados con otros clientes', PR_W / 2, 220, 'center', 48);
+    B.resultados.forEach((r, i) => {
+      const x = 255 + i * 760;
+      ctx.fillStyle = PR_TINTA; ctx.font = '600 22px Montserrat'; ctx.textAlign = 'left'; ctx.letterSpacing = '1px';
+      ctx.fillText((r.nombre || `Cliente ${i + 1}`).toUpperCase(), x, 300);
+      prFoto(ctx, r.antes, x, 320, 320, 500, 'Antes');
+      prFoto(ctx, r.despues, x + 340, 320, 320, 500, 'Después');
+      ctx.textAlign = 'center'; ctx.fillText('ANTES', x + 160, 865); ctx.fillText('DESPUÉS', x + 500, 865); ctx.letterSpacing = '0px';
+    });
+    prLinea(ctx, 227, 1692, 972);
+  }
+  else if(k === 'proceso'){
+    B.proceso.forEach((p, i) => {
+      const x = 329 + i * 424;
+      prPunto(ctx, x + 207, 215);
+      prFoto(ctx, p.img, x, 240, 414, 529, 'Foto de tu proceso');
+      prCuerpo(ctx, `${i + 1}. ${p.texto}`, x + 207, 830, 400, 'center', 22);
+    });
+    prLinea(ctx, 447, 1473, 972);
+  }
+  else if(k === 'metodologia'){
+    prTitulo(ctx, 'Metodología', PR_W / 2, 235);
+    B.metodologia.forEach((m, i) => {
+      const cx = 400 + i * 373;
+      ctx.fillStyle = prMarca(); ctx.font = 'italic 500 110px "Cormorant Garamond"'; ctx.textAlign = 'center';
+      ctx.fillText(String(i + 1).padStart(2, '0'), cx, 450);
+      ctx.fillStyle = PR_TINTA; ctx.font = '600 26px Montserrat'; ctx.letterSpacing = '2px';
+      ctx.fillText((m.titulo || '').toUpperCase(), cx, 530); ctx.letterSpacing = '0px';
+      prCuerpo(ctx, m.texto, cx, 590, 300, 'center', 21);
+    });
+    prLinea(ctx, 447, 1473, 972);
+  }
+  else if(k === 'inversion'){
+    const C = proy.cotizacion;
+    prTitulo(ctx, C && C.paquetes.length > 1 ? 'Opciones de inversión' : (C && C.paquetes[0] && C.paquetes[0].nombre) || 'Inversión', PR_W / 2, 200);
+    prLinea(ctx, 280, 1640, 240);
+    if(!C){
+      prCuerpo(ctx, '', PR_W / 2, 560, 900, 'center', 26, 'Haz tu cotización y aquí aparecerán tus paquetes y precios');
+    } else {
+      const n = C.paquetes.length, bw = Math.min(560, (1400 - (n - 1) * 50) / n), x0 = (PR_W - (n * bw + (n - 1) * 50)) / 2;
+      C.paquetes.forEach((pq, i) => {
+        const x = x0 + i * (bw + 50), r = calcularPaquete(pq, C.impuesto);
+        ctx.strokeStyle = PR_TINTA; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.roundRect(x, 285, bw, 630, 14); ctx.stroke();
+        ctx.fillStyle = PR_TINTA; ctx.font = '600 38px "Cormorant Garamond"'; ctx.letterSpacing = '4px';
+        prTexto(ctx, n > 1 ? (pq.nombre || 'Opción ' + (i + 1)) : 'Incluye:', x + bw / 2, 355, bw - 60, 44, 'center', true); ctx.letterSpacing = '0px';
+        let y = 430;
+        const items = (pq.incluye != null ? pq.incluye : incluyeSugerido(pq)).split('\n').map(t => t.trim()).filter(Boolean);
+        ctx.font = '500 22px Montserrat';
+        items.forEach(it => {
+          if(y > 770) return;
+          ctx.beginPath(); ctx.arc(x + 62, y - 8, 12, 0, Math.PI * 2); ctx.fillStyle = '#2e9e57'; ctx.fill();
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x + 56, y - 8); ctx.lineTo(x + 61, y - 3); ctx.lineTo(x + 69, y - 13); ctx.stroke();
+          ctx.fillStyle = PR_TINTA; ctx.font = '500 22px Montserrat'; ctx.letterSpacing = '1px';
+          y = prTexto(ctx, it, x + 90, y, bw - 130, 30, 'left', true) + 14; ctx.letterSpacing = '0px';
+        });
+        const monto = C.impuesto.activo ? r.precio : r.total;
+        const etq = '$' + Math.round(monto).toLocaleString('es-MX');
+        ctx.font = '700 54px Montserrat'; const ew = ctx.measureText(etq).width;
+        ctx.font = '500 24px Montserrat'; const mw = ctx.measureText(MONEDA).width;
+        const sx = x + bw / 2 - (ew + 12 + mw) / 2;
+        ctx.fillStyle = PR_TINTA; ctx.textAlign = 'left';
+        ctx.font = '700 54px Montserrat'; ctx.fillText(etq, sx, 870);
+        ctx.font = '500 24px Montserrat'; ctx.fillText(MONEDA, sx + ew + 12, 870);
+        if(C.impuesto.activo){ ctx.fillStyle = prMarca(); ctx.font = '500 20px Montserrat'; ctx.textAlign = 'left'; ctx.fillText(`El precio no incluye IVA (${num(C.impuesto.pct)}%)`, x, 955); }
+      });
+    }
+  }
+  else if(k === 'empezamos'){
+    prTitulo(ctx, 'Empezamos:', PR_W / 2, 210);
+    ctx.strokeStyle = prMarca(); ctx.lineWidth = 2.5; ctx.beginPath(); ctx.roundRect(640, 300, 560, 500, 14); ctx.stroke();
+    ctx.fillStyle = PR_TINTA; ctx.font = '600 38px "Cormorant Garamond"'; ctx.letterSpacing = '4px'; ctx.textAlign = 'center'; ctx.fillText('SIGUIENTE:', 920, 370); ctx.letterSpacing = '0px';
+    let y = 440;
+    B.pasos.split('\n').map(t => t.trim()).filter(Boolean).slice(0, 7).forEach(t => {
+      prPunto(ctx, 712, y - 8);
+      ctx.fillStyle = PR_TINTA; ctx.font = '400 24px Montserrat';
+      y = prTexto(ctx, t, 740, y, 420, 32, 'left') + 18;
+    });
+    ctx.strokeStyle = PR_TINTA; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.roundRect(1300, 480, 480, 270, 14); ctx.stroke();
+    ctx.fillStyle = PR_TINTA; ctx.font = '600 32px "Cormorant Garamond"'; ctx.letterSpacing = '3px'; ctx.textAlign = 'right'; ctx.fillText('DATOS BANCARIOS', 1750, 535); ctx.letterSpacing = '0px';
+    const bc = B.banco, filas = [[bc.titular || '[Tu nombre completo]', 400], [bc.banco || '[Banco]', 400], ['CLABE', 700], [bc.clabe || '[000 000 0000000000 0]', 400], ['Número de cuenta', 700], [bc.cuenta || '[0000000000]', 400]];
+    filas.forEach(([t, w], i) => { ctx.font = `${w} 22px Montserrat`; ctx.fillStyle = t.startsWith('[') ? PR_GRIS : PR_TINTA; ctx.fillText(t, 1750, 580 + i * 29); });
+    prLinea(ctx, 1300, 1790, 790);
+  }
+}
+
+// ---------- Editor ----------
+async function abrirPropuesta(proy){
+  const N = T.alumno.negocio || {};
+  const B = Object.assign(PR_BASE(), JSON.parse(JSON.stringify(N.propuesta || {})));
+  const P = Object.assign(PR_PROY(proy), JSON.parse(JSON.stringify(proy.propuesta || {})));
+  if(!B.marcas.length && !(proy.propuesta && proy.propuesta.apagados) && !P.apagados.includes('marcas')) P.apagados.push('marcas');
+  let actual = 'portada';
+  const bg = document.createElement('div');
+  bg.className = 'pr-bg';
+  bg.innerHTML = '<div class="cargando">Preparando tu propuesta…</div>';
+  document.body.appendChild(bg); document.body.style.overflow = 'hidden';
+  await siFuentes();
+  if(N.logo){ try { PR_IMG.__logo = await prCargarImg(N.logo); } catch(e){} }
+  await prTraerImagenes([...B.frames, ...B.marcas, ...B.resultados.flatMap(r => [r.antes, r.despues]), ...B.proceso.map(p => p.img), P.cliente_img, P.problema_img]);
+
+  let tGuardar = null;
+  const guardarYa = async () => {
+    clearTimeout(tGuardar); tGuardar = null;
+    const negocio = Object.assign({}, T.alumno.negocio || {}, { propuesta: B });
+    const [r1] = await Promise.all([
+      sb.rpc('taller_guardar_negocio', { p_token: T.token, p_pin: T.pin, p_negocio: negocio }),
+      guardar({ id: proy.id, propuesta: P }, { sinRender: true })
+    ]);
+    if(!r1.error) T.alumno.negocio = negocio;
+  };
+  const programarGuardado = () => { clearTimeout(tGuardar); tGuardar = setTimeout(guardarYa, 1500); };
+  const cerrar = async () => { if(tGuardar) await guardarYa(); bg.remove(); document.body.style.overflow = ''; renderTablero(); };
+  const encendida = k => !P.apagados.includes(k);
+
+  const campo = (etq, html, base) => `<div class="campo"><label>${etq}${base ? ' <span class="pr-base" title="Se guarda para todas tus propuestas">para todas</span>' : ''}</label>${html}</div>`;
+  const inp = (path, val, ph) => `<input data-p="${path}" value="${esc(val || '')}" placeholder="${esc(ph || '')}">`;
+  const area = (path, val, ph, filas) => `<textarea data-p="${path}" rows="${filas || 3}" class="cot-textarea" placeholder="${esc(ph || '')}">${esc(val || '')}</textarea>`;
+  const foto = (path, id, etq, logo) => `
+    <div class="pr-foto">
+      <div class="pr-foto-prev">${id && PR_IMG[id] ? `<img src="${PR_IMG[id].src}" alt="">` : `<span>${etq}</span>`}</div>
+      <label class="btn ghost pr-subir">${id ? 'Cambiar' : 'Subir'}<input type="file" accept="image/*" data-foto="${path}" ${logo ? 'data-logo="1"' : ''} hidden></label>
+      ${id ? `<button type="button" class="pr-quitar" data-quitarfoto="${path}">Quitar</button>` : ''}
+    </div>`;
+
+  function formulario(k){
+    const cli = proy.cliente || 'tu cliente';
+    switch(k){
+      case 'portada': return `
+        <p class="pr-ayuda">Tu logo y tu color salen de <a href="#" data-negocio>🏷️ Mi negocio</a>.</p>
+        ${campo('A qué te dedicas', inp('B.giro', B.giro, 'Ej. Casa productora, Fotografía de bodas'), true)}
+        ${campo('Tu ciudad', inp('B.ciudad', B.ciudad, 'Ej. Querétaro'), true)}`;
+      case 'quienes': return `
+        ${campo('¿Quiénes son? En pocas palabras', inp('B.quienes_titulo', B.quienes_titulo, 'Ej. Somos una boutique de contenido.'), true)}
+        ${campo('Qué hacen y para quién, en una línea', area('B.quienes_texto', B.quienes_texto, 'Ej. Generamos impacto en la percepción de las marcas desde la congruencia en su comunicación', 2), true)}
+        ${campo('Frames de tus 3 mejores videos', `<div class="pr-fotos">${[0, 1, 2].map(i => foto(`B.frames.${i}`, B.frames[i], 'Frame ' + (i + 1))).join('')}</div>`, true)}`;
+      case 'marcas': return `
+        <p class="pr-ayuda">Logos de las marcas con las que has trabajado. Si aún no tienes, apaga este slide.</p>
+        ${campo('Logos', `<div class="pr-fotos">${B.marcas.map((id, i) => foto(`B.marcas.${i}`, id, 'Logo', true)).join('')}
+          <label class="btn ghost pr-subir pr-mas">+ Agregar logo<input type="file" accept="image/*" data-foto="B.marcas.${B.marcas.length}" data-logo="1" hidden></label></div>`, true)}`;
+      case 'logros': return `
+        <p class="pr-ayuda">Aquí hablas de ${esc(cli)}, no de ti: 3 cosas que ya ha logrado. Demuestra que lo investigaste.</p>
+        ${[0, 1, 2].map(i => campo(`Logro ${i + 1}`, inp(`P.logros.${i}`, P.logros[i], ['Ej. 10 años en el mercado', 'Ej. 100 mil seguidores', 'Ej. 3 sucursales en la ciudad'][i]))).join('')}
+        ${campo('Foto de tu cliente', foto('P.cliente_img', P.cliente_img, 'Foto'))}`;
+      case 'problema': return `
+        <p class="pr-ayuda">Un solo problema, dicho con respeto. No critiques: muestra la oportunidad.</p>
+        ${campo('El problema en una frase', area('P.problema', P.problema, 'Ej. A tu Instagram le falta un plus', 2))}
+        ${campo('Captura que lo muestre', foto('P.problema_img', P.problema_img, 'Captura'))}`;
+      case 'solucion': return `
+        <p class="pr-ayuda">Responde al problema en una sola idea. Todavía sin precios.</p>
+        ${campo('La solución', area('P.solucion', P.solucion, `Comunicar quién es ${cli}`, 2))}`;
+      case 'transicion': return `<p class="pr-ayuda">Slide de transición: aquí haces una pausa y pasas a explicar qué le vas a ofrecer. No necesitas cambiar nada.</p>`;
+      case 'resultados': return `
+        <p class="pr-ayuda">Opcional: el antes y después de 1 o 2 clientes, con vistas o resultados visibles.</p>
+        ${B.resultados.map((r, i) => `<div class="pr-grupo">${campo(`Cliente ${i + 1}`, inp(`B.resultados.${i}.nombre`, r.nombre, 'Nombre'), true)}
+          <div class="pr-fotos">${foto(`B.resultados.${i}.antes`, r.antes, 'Antes')}${foto(`B.resultados.${i}.despues`, r.despues, 'Después')}</div></div>`).join('')}`;
+      case 'proceso': return `
+        <p class="pr-ayuda">Tu proceso en 3 pasos, con fotos detrás de cámaras.</p>
+        ${B.proceso.map((p, i) => `<div class="pr-grupo">${campo(`Paso ${i + 1}`, inp(`B.proceso.${i}.texto`, p.texto), true)}${foto(`B.proceso.${i}.img`, p.img, 'Foto')}</div>`).join('')}`;
+      case 'metodologia': return `
+        <p class="pr-ayuda">Las etapas de tu servicio y qué pasa en cada una.</p>
+        ${B.metodologia.map((m, i) => `<div class="pr-grupo">${campo(`Etapa ${i + 1}`, inp(`B.metodologia.${i}.titulo`, m.titulo), true)}${area(`B.metodologia.${i}.texto`, m.texto, '', 2)}</div>`).join('')}`;
+      case 'inversion': return proy.cotizacion
+        ? `<p class="pr-ayuda">Los paquetes, lo que incluyen y los precios salen de tu cotización.</p><button class="btn" data-cotizador>🧮 Editar cotización</button>`
+        : `<p class="pr-ayuda">Todavía no tienes cotización para este proyecto. Hazla y aquí aparecerán tus paquetes y precios.</p><button class="btn" data-cotizador>🧮 Hacer cotización</button>`;
+      case 'empezamos': return `
+        ${campo('Siguientes pasos (uno por renglón)', area('B.pasos', B.pasos, '', 6), true)}
+        ${campo('Titular de la cuenta', inp('B.banco.titular', B.banco.titular, 'Tu nombre completo'), true)}
+        ${campo('Banco', inp('B.banco.banco', B.banco.banco, 'Ej. BBVA'), true)}
+        <div class="fila2">${campo('CLABE', inp('B.banco.clabe', B.banco.clabe), true)}${campo('Número de cuenta', inp('B.banco.cuenta', B.banco.cuenta), true)}</div>`;
+    }
+    return '';
+  }
+
+  function render(){
+    const s = PR_SLIDES.find(x => x.k === actual);
+    bg.innerHTML = `
+      <div class="pr-top">
+        <div><div class="hero-marca">Propuesta de venta</div><strong>${esc(proy.nombre)}${proy.cliente ? ' · ' + esc(proy.cliente) : ''}</strong></div>
+        <div class="pr-top-acc">
+          <a href="${PLANTILLA_CANVA}" target="_blank" rel="noopener" class="pr-canva">¿Prefieres diseñarla tú? Plantilla de Canva ↗</a>
+          <button class="btn" data-pdf>📄 Descargar PDF</button>
+          <button class="cot-x" data-cerrar title="Cerrar">✕</button>
+        </div>
+      </div>
+      <div class="pr-cuerpo">
+        <nav class="pr-nav">${PR_SLIDES.map((x, i) => `<button class="${x.k === actual ? 'on' : ''} ${encendida(x.k) ? '' : 'off'}" data-slide="${x.k}"><span>${i + 1}</span>${x.t}</button>`).join('')}</nav>
+        <div class="pr-editor">
+          <div class="pr-editor-head">
+            <h3>${PR_SLIDES.indexOf(s) + 1}. ${s.t}</h3>
+            ${['portada', 'inversion', 'empezamos'].includes(actual) ? '' : `<label class="pr-toggle"><input type="checkbox" data-encender ${encendida(actual) ? 'checked' : ''}> Incluir este slide</label>`}
+          </div>
+          <div class="pr-form">${formulario(actual)}</div>
+          <div class="pr-preview ${encendida(actual) ? '' : 'apagado'}"><canvas id="pr-canvas" width="${PR_W}" height="${PR_H}"></canvas></div>
+          <div class="pr-pie">
+            ${PR_SLIDES.indexOf(s) > 0 ? '<button class="btn ghost" data-mover="-1">← Anterior</button>' : '<span></span>'}
+            ${PR_SLIDES.indexOf(s) < PR_SLIDES.length - 1 ? '<button class="btn" data-mover="1">Siguiente →</button>' : '<button class="btn" data-pdf>📄 Descargar PDF</button>'}
+          </div>
+        </div>
+      </div>`;
+    pintar();
+  }
+  const pintar = () => { const c = bg.querySelector('#pr-canvas'); if(c) prDibujar(c.getContext('2d'), actual, B, P, proy); };
+  const fijar = (path, val) => {
+    const partes = path.split('.'), raiz = partes.shift() === 'B' ? B : P;
+    let o = raiz; while(partes.length > 1) o = o[partes.shift()];
+    o[partes[0]] = val;
+  };
+
+  bg.addEventListener('input', e => {
+    const t = e.target;
+    if(t.dataset.p){ fijar(t.dataset.p, t.value); pintar(); programarGuardado(); }
+  });
+  bg.addEventListener('change', async e => {
+    const t = e.target;
+    if(t.dataset.encender !== undefined){
+      P.apagados = P.apagados.filter(k => k !== actual);
+      if(!t.checked) P.apagados.push(actual);
+      render(); programarGuardado();
+    }
+    if(t.dataset.foto && t.files[0]){
+      const lbl = t.closest('label'); if(lbl) lbl.firstChild.textContent = 'Subiendo…';
+      try {
+        const id = await prSubir(t.files[0], !!t.dataset.logo);
+        fijar(t.dataset.foto, id);
+        render(); programarGuardado();
+      } catch(err){
+        if(err.message === 'pin'){ bg.remove(); document.body.style.overflow = ''; return; }
+        toast('No se pudo subir la imagen. Prueba con otra o revisa tu conexión.'); render();
+      }
+    }
+  });
+  bg.addEventListener('click', async e => {
+    const a = e.target.closest('a[data-negocio]');
+    if(a){ e.preventDefault(); abrirMiNegocio(async () => { if(T.alumno.negocio.logo){ try { PR_IMG.__logo = await prCargarImg(T.alumno.negocio.logo); } catch(er){} } pintar(); }); return; }
+    const t = e.target.closest('button');
+    if(!t) return;
+    const d = t.dataset;
+    if(d.cerrar !== undefined) return cerrar();
+    if(d.slide){ actual = d.slide; render(); }
+    if(d.mover){ actual = PR_SLIDES[PR_SLIDES.findIndex(x => x.k === actual) + +d.mover].k; render(); bg.querySelector('.pr-editor').scrollTop = 0; }
+    if(d.quitarfoto){
+      const partes = d.quitarfoto.split('.');
+      if(partes[1] === 'marcas') B.marcas.splice(+partes[2], 1); else fijar(d.quitarfoto, '');
+      render(); programarGuardado();
+    }
+    if(d.cotizador !== undefined){
+      await cerrar();
+      abrirCotizador(buscar(proy.id));
+    }
+    if(d.pdf !== undefined){
+      t.disabled = true; const txt = t.textContent; t.textContent = 'Preparando…';
+      try { await prDescargarPDF(B, P, proy); } finally { t.disabled = false; t.textContent = txt; }
+      if(tGuardar) guardarYa();
+    }
+  });
+  render();
+}
+
+async function prDescargarPDF(B, P, proy){
+  let jsPDF;
+  try { jsPDF = await cargarJsPDF(); } catch(e){ toast('No se pudo preparar el PDF. Revisa tu conexión.'); return; }
+  const slides = PR_SLIDES.filter(x => !P.apagados.includes(x.k) || ['portada', 'inversion', 'empezamos'].includes(x.k));
+  const doc = new jsPDF({ orientation:'landscape', unit:'pt', format:[960, 540] });
+  const c = document.createElement('canvas'); c.width = PR_W; c.height = PR_H;
+  const ctx = c.getContext('2d');
+  slides.forEach((s, i) => {
+    prDibujar(ctx, s.k, B, P, proy);
+    if(i) doc.addPage([960, 540], 'landscape');
+    doc.addImage(c.toDataURL('image/jpeg', .85), 'JPEG', 0, 0, 960, 540);
+  });
+  await siEntregar(doc.output('blob'), siArchivo('Propuesta ' + (proy.cliente || proy.nombre || ''), 'pdf'), 'application/pdf');
 }
 
 function abrirEditor(p){
