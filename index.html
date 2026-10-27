@@ -18,6 +18,7 @@
     --negro:#0a0908;
     --hueso:#f7f5f2;
     --hueso2:#efece6;
+    --hueso3:#e8e3d9;
     --linea:#e4dfd6;
     --texto:#2b2b2b;
     --gris:#8a8578;
@@ -229,6 +230,11 @@
   .ig-stats strong{font-size:1.25rem;}
   .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;}
   .ig-card{cursor:default;margin:0;}
+  /* Mensuales va aparte del flujo Ventas → Producción → Cobranza: bloque en tono hueso más oscuro */
+  #sec-mensuales{background:var(--hueso3);border:1px solid #d9d2c4;border-radius:20px;padding:24px 24px 26px;margin-top:46px;}
+  .ig-aparte{font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gris);background:rgba(255,255,255,0.55);border-radius:999px;padding:3px 10px;}
+  .paso[data-ir="mensuales"]{background:var(--hueso3);border-color:#d9d2c4;}
+  @media (max-width:640px){ #sec-mensuales{padding:18px 14px 20px;border-radius:16px;} }
   .ig-head{display:flex;justify-content:space-between;gap:10px;cursor:pointer;}
   .ig-monto{font-weight:800;font-size:1.05rem;white-space:nowrap;}
   .ig-monto span{font-size:0.72rem;font-weight:600;color:var(--gris);}
@@ -2502,7 +2508,7 @@ function renderMensuales(){
   const pausadas = T.igualas.filter(ig => !ig.activa);
   return `
     <section class="seccion" id="sec-mensuales" style="--c:var(--mensual)">
-      <div class="seccion-head"><span class="chip-num">4</span><h2>Clientes mensuales</h2></div>
+      <div class="seccion-head"><span class="chip-num">4</span><h2>Clientes mensuales</h2><span class="ig-aparte">Aparte de tus proyectos</span></div>
       <p class="seccion-intro">Tus igualas: cada mes se arma solo con lo que le entregas a cada cliente y su cobro. Marca cada entregable conforme lo entregues y su pago cuando te depositen.</p>
       <div class="ig-barra">
         <div class="ig-mes">
