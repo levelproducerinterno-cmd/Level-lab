@@ -415,6 +415,7 @@
   .bloq-desc{color:#5b574f;line-height:1.55;font-size:0.92rem;}
   .bloq-precio{font-size:1.5rem;font-weight:800;margin:6px 0 16px;}
   .bloq-cta{display:block;text-decoration:none;background:var(--c);font-size:1rem;padding:14px;}
+  .bloq-wa{display:block;margin-top:12px;font-size:0.88rem;font-weight:600;color:var(--texto);}
   .curso-barra{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
   .curso-volver{background:none;border:none;font-weight:700;font-size:0.88rem;color:var(--texto);padding:8px 0;}
   .curso-tabs{display:flex;background:var(--hueso2);border-radius:999px;padding:4px;}
@@ -3001,8 +3002,12 @@ function verCursoBloqueado(c){
       <h3>${esc(c.nombre)}</h3>
       ${c.descripcion ? `<p class="bloq-desc">${esc(c.descripcion)}</p>` : ''}
       ${precioCurso(c) ? `<div class="bloq-precio">${precioCurso(c)}</div>` : ''}
-      <a class="btn bloq-cta" href="${linkWhatsApp(T.whatsapp, msg)}" target="_blank" rel="noopener">Lo quiero 💬</a>
-      <p class="ayuda" style="margin-top:10px;">Te abrimos WhatsApp para platicar con Sofía. En cuanto lo tengas, aparece aquí mismo, en tu mismo link.</p>
+      ${c.link_pago
+        ? `<a class="btn bloq-cta" href="${esc(c.link_pago)}" target="_blank" rel="noopener">Comprar ahora →</a>
+           <a class="bloq-wa" href="${linkWhatsApp(T.whatsapp, msg)}" target="_blank" rel="noopener">💬 ¿Dudas? Escríbele a Sofía</a>
+           <p class="ayuda" style="margin-top:10px;">Pago seguro con Stripe. Cuando Sofía confirme tu pago, el taller se desbloquea aquí mismo, en tu mismo link.</p>`
+        : `<a class="btn bloq-cta" href="${linkWhatsApp(T.whatsapp, msg)}" target="_blank" rel="noopener">Lo quiero 💬</a>
+           <p class="ayuda" style="margin-top:10px;">Te abrimos WhatsApp para platicar con Sofía. En cuanto lo tengas, aparece aquí mismo, en tu mismo link.</p>`}
       <button class="btn ghost" data-cerrar style="width:100%;margin-top:6px;">Ahora no</button>
     </div>`;
   document.body.appendChild(bg);
@@ -3270,6 +3275,8 @@ function editarCurso(c){
         <div class="campo"><label>Precio</label><input id="c-precio" type="number" inputmode="decimal" value="${d.precio ?? ''}" placeholder="Ej. 3000"></div>
         <div class="campo"><label>Moneda</label><select id="c-moneda">${MONEDAS.map(([m]) => `<option ${m === d.moneda ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
       </div>
+      <div class="campo"><label>Link de pago (Stripe u otro, opcional)</label><input id="c-pago" type="url" value="${esc(d.link_pago || '')}" placeholder="https://buy.stripe.com/…">
+        <div class="ayuda" style="margin-top:4px;">Quien no tenga el taller verá el botón “Comprar ahora”. Si lo dejas vacío, el botón abre tu WhatsApp.</div></div>
       <div class="campo"><label>Color de su pastilla</label><div class="chips">${COLORES_MARCA.map(col => `<button type="button" class="color-chip ${col === d.color ? 'on' : ''}" data-color="${col}" style="background:${col}"></button>`).join('')}</div></div>
       <label class="cot-check"><input type="checkbox" id="c-pub" ${d.publicado ? 'checked' : ''}> Visible para todos mis alumnos (si lo apagas, solo lo ven quienes ya lo tienen)</label>
       <div class="modal-pie">
@@ -3300,7 +3307,9 @@ function editarCurso(c){
       const nombre = $('c-nombre').value.trim();
       if(!nombre){ $('c-nombre').focus(); toast('Ponle nombre'); return; }
       const datos = { nombre, tipo: d.tipo, emoji: $('c-emoji').value.trim(), descripcion: $('c-desc').value.trim(),
-        precio: $('c-precio').value, moneda: $('c-moneda').value, color: d.color, publicado: $('c-pub').checked };
+        precio: $('c-precio').value, moneda: $('c-moneda').value, color: d.color, publicado: $('c-pub').checked,
+        link_pago: $('c-pago').value.trim() };
+      if(datos.link_pago && !/^https?:\/\//i.test(datos.link_pago)){ $('c-pago').focus(); toast('El link de pago debe empezar con https://'); return; }
       if(nuevo) datos.slug = slugDe(nombre); else datos.id = c.id;
       t.disabled = true;
       const { data, error } = await adm('taller_admin_guardar_curso', { p: datos });
