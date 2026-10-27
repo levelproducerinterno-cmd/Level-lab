@@ -11,7 +11,7 @@
 <title>Organiza tus proyectos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   :root{
@@ -209,7 +209,52 @@
   .color-chip{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--linea);}
   .color-chip.on{box-shadow:0 0 0 2px var(--negro);}
   #n-color{width:34px;height:34px;border:none;background:none;padding:0;}
-  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--negro);color:#fff;padding:11px 18px;border-radius:10px;font-size:0.88rem;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.2);}
+  /* Sistema interno */
+  .si-banner{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#f3ede3;border:1px solid #e2d8c6;border-radius:14px;padding:14px 18px;margin:4px 0 6px;}
+  .si-banner p{flex:1;min-width:220px;margin:0;font-family:'Cormorant Garamond',serif;font-size:1.25rem;line-height:1.35;color:#2b2620;}
+  .si-banner .btn{background:#2b2620;}
+  .si-banner-anillos{width:44px;height:44px;flex:0 0 auto;border-radius:50%;background:repeating-radial-gradient(circle,#f3ede3 0 3px,#7f9a6b 3px 4px,#f3ede3 4px 7px,#c8613a 7px 8px,#f3ede3 8px 11px,#d4a537 11px 12px);border:1.5px solid #2b2620;}
+  .si-bg{position:fixed;inset:0;z-index:120;background:#f3ede3;overflow:auto;padding:24px 16px 40px;}
+  .si-panel{position:relative;max-width:620px;margin:0 auto;font-family:'Cormorant Garamond',serif;color:#2b2620;}
+  .si-panel.ancho{max-width:860px;}
+  .si-x{position:absolute;right:0;top:0;width:38px;height:38px;border-radius:50%;border:1px solid #d9cdb8;background:transparent;color:#2b2620;}
+  .si-progreso{height:3px;background:#e2d8c6;border-radius:3px;margin:12px 52px 0 0;overflow:hidden;}
+  .si-progreso > div{height:100%;background:#c8613a;transition:width .3s;}
+  .si-cuerpo{padding-top:44px;}
+  .si-eyebrow{font-family:Montserrat,sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#8a7f70;display:flex;align-items:center;gap:8px;}
+  .si-panel h2{font-size:2.5rem;font-weight:600;line-height:1.1;margin:10px 0 14px;}
+  .si-panel p{font-size:1.25rem;line-height:1.5;color:#4a443c;margin:0 0 14px;}
+  .si-def{border-left:2px solid #c8613a;padding-left:16px;}
+  .si-input{width:100%;font-family:'Cormorant Garamond',serif;font-size:1.45rem;background:transparent;border:none;border-bottom:1.5px solid #2b2620;padding:10px 2px;color:#2b2620;outline:none;}
+  .si-area{border:1.5px solid #cfc2ad;border-radius:12px;padding:14px;resize:vertical;line-height:1.45;background:rgba(255,255,255,.35);}
+  .si-chips{margin:14px 0;}
+  .si-chips .chip{background:transparent;border-color:#cfc2ad;color:#2b2620;font-family:Montserrat,sans-serif;}
+  .si-chips .chip.on{background:#2b2620;color:#f3ede3;}
+  .si-ideas-tit{font-family:Montserrat,sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#8a7f70;margin-top:16px;}
+  .si-otra{display:flex;gap:10px;align-items:flex-end;}
+  .si-otra .btn{background:#2b2620;flex:0 0 auto;}
+  .si-orden{list-style:none;padding:0;margin:20px 0 0;}
+  .si-orden li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e2d8c6;font-size:1.4rem;}
+  .si-orden .si-nom{flex:1;}
+  .si-orden button{width:34px;height:34px;border-radius:50%;border:1px solid #d9cdb8;background:transparent;color:#2b2620;}
+  .si-orden button:disabled{opacity:.3;}
+  .si-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;color:#fff;font-family:Montserrat,sans-serif;font-size:0.8rem;font-weight:700;flex:0 0 auto;}
+  .si-pie{display:flex;justify-content:space-between;margin-top:28px;}
+  .si-pie .btn{background:#2b2620;font-family:Montserrat,sans-serif;}
+  .si-pie .btn.ghost{background:transparent;color:#2b2620;border-color:#cfc2ad;}
+  .si-mapa{margin:10px auto 18px;max-width:640px;}
+  .si-canvas{width:100%;height:auto;display:block;border-radius:14px;}
+  .si-acciones{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:26px;}
+  .si-acciones .btn{background:#2b2620;font-family:Montserrat,sans-serif;}
+  .si-acciones .btn.ghost{background:transparent;color:#2b2620;border-color:#cfc2ad;}
+  .si-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+  .si-item{border:1px solid #e2d8c6;border-radius:12px;padding:14px 16px;background:rgba(255,255,255,.3);}
+  .si-item-tit{display:flex;align-items:center;gap:8px;font-size:1.45rem;font-weight:600;margin-bottom:6px;}
+  .si-item ul{margin:0;padding-left:20px;font-size:1.15rem;line-height:1.45;color:#4a443c;}
+  .si-item p{font-size:1.15rem;}
+  .si-vacio{color:#aaa094;font-style:italic;}
+  @media (max-width:700px){ .si-panel h2{font-size:2rem;} .si-cuerpo{padding-top:36px;} }
+  .toast{position:fixed;z-index:300;bottom:22px;left:50%;transform:translateX(-50%);background:var(--negro);color:#fff;padding:11px 18px;border-radius:10px;font-size:0.88rem;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.2);}
   .cargando{text-align:center;color:var(--gris);padding:60px 20px;}
 
   /* ---------- Panel del CRM (alumnos) ---------- */
@@ -517,6 +562,12 @@ function renderTablero(destacarId){
       </div>
     </div>
 
+    <div class="si-banner">
+      <span class="si-banner-anillos" aria-hidden="true"></span>
+      <p><strong>Recuerda:</strong> para avanzar profesionalmente, primero tienes que estar bien contigo.</p>
+      <button class="btn" id="b-sistema">${T.alumno.sistema ? 'Ver mi sistema interno' : 'Descubre tu sistema interno →'}</button>
+    </div>
+
     <nav class="recorrido">
       <button class="paso" style="--c:var(--ventas)" data-ir="ventas">
         <div class="paso-num">1 · Ventas</div>
@@ -581,6 +632,7 @@ function renderTablero(destacarId){
   }));
   document.getElementById('b-nuevo').addEventListener('click', () => abrirEditor(null));
   document.getElementById('b-negocio').addEventListener('click', () => abrirMiNegocio());
+  document.getElementById('b-sistema').addEventListener('click', abrirSistemaInterno);
   const bEj = document.getElementById('b-borrar-ejemplos');
   if(bEj) bEj.addEventListener('click', borrarEjemplos);
   conectarTarjetas();
@@ -1351,6 +1403,436 @@ async function descargarPDF(p, C){
   const a = document.createElement('a');
   a.href = url; a.download = nombreArchivo;
   document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+// ============================================================
+// ============ SISTEMA INTERNO (cosmovisión) ===================
+// ============================================================
+// Preguntas paso a paso → mapa de anillos (como los de un árbol) con el nombre al centro:
+// el anillo más cercano es la prioridad 1. Se descarga en PDF y como fondo de pantalla.
+const COSMOVISION_DEF = 'Una cosmovisión (del alemán Weltanschauung) es la imagen, el concepto general o el marco interpretativo a través del cual una persona, época o cultura percibe, comprende y explica la realidad, la naturaleza, el universo y el lugar que ocupa el ser humano en él.';
+const SI_PAPEL = '#f3ede3', SI_TINTA = '#2b2620';
+const SI_COLORES = ['#7f9a6b', '#d4a537', '#c8613a', '#5a7a95', '#c99295', '#3f7f7a', '#8a6a8f', '#a39a55', '#b5793f', '#6f8fb0'];
+const SI_PRIORIDADES = ['Yo', 'Familia', 'Amigos', 'Pareja', 'Salud', 'Negocio', 'Proyecto personal', 'Espiritualidad'];
+const SI_IDEAS = {
+  'yo': ['Desayunar en silencio', 'Tomar un café sin prisa', 'Leer una novela', 'Ir al parque', 'Ver una película', 'Escribir', 'Meditar', 'Dormir bien'],
+  'familia': ['Hablarle a mi mamá 1 o 2 veces por semana', 'Ir con mi familia una vez a la semana', 'Comer juntos sin celular', 'Estar presente en sus fechas importantes'],
+  'amigos': ['Mandarles mensaje para saber cómo están', 'Vernos una vez al mes', 'Celebrar sus logros', 'Estar cuando me necesitan'],
+  'pareja': ['Una cita a la semana', 'Tiempo juntos sin pantallas', 'Escucharnos con atención', 'Planear algo juntos'],
+  'salud': ['Hacer ejercicio 3 veces por semana', 'Dormir 8 horas', 'Comer bien', 'Tomar agua', 'Ir al médico una vez al año'],
+  'negocio': ['Trabajar en mi negocio, no solo en él', 'Mejorar mis sistemas', 'Cuidar a las personas con las que trabajo', 'Cuidar a mis clientes', 'Revisar mis números cada lunes'],
+  'proyecto personal': ['Hacer un proyecto al año', 'Juntarme con personas que hacen lo mismo', 'Apartar tiempo cada semana para crear', 'Seguir aprendiendo'],
+  'espiritualidad': ['Meditar', 'Agradecer cada día', 'Estar en la naturaleza', 'Un momento de silencio al día']
+};
+const siIdeas = nombre => SI_IDEAS[String(nombre).trim().toLowerCase()] || ['Apartar tiempo cada semana para esto', 'Ponerlo en mi calendario', 'Pedir ayuda cuando lo necesite'];
+const siPregunta = nombre => String(nombre).trim().toLowerCase() === 'yo' ? '¿Qué haces para cuidarte a ti?' : `¿Qué haces para cuidar ${/^(mi|mis|el|la|los|las) /i.test(nombre) ? '' : 'de '}${nombre}?`;
+const siColor = i => SI_COLORES[i % SI_COLORES.length];
+
+function abrirSistemaInterno(){
+  const previo = T.alumno.sistema;
+  const S = previo ? JSON.parse(JSON.stringify(previo)) : {
+    nombre: String(T.alumno.nombre || '').split(' ')[0], prioridades: [], centro: '', exito: ''
+  };
+  let paso = previo ? 'resultado' : 'intro';
+  const bg = document.createElement('div');
+  bg.className = 'si-bg';
+  document.body.appendChild(bg);
+  document.body.style.overflow = 'hidden';
+  const cerrar = () => { bg.remove(); document.body.style.overflow = ''; renderTablero(); };
+  const pasos = () => ['intro', 'nombre', 'prioridades', ...S.prioridades.map((_, i) => 'p' + i), 'centro', 'exito', 'resultado'];
+
+  function render(){
+    const lista = pasos();
+    const idx = lista.indexOf(paso);
+    const progreso = paso === 'resultado' ? '' : `<div class="si-progreso"><div style="width:${Math.round(idx / (lista.length - 1) * 100)}%"></div></div>`;
+    let cuerpo = '';
+    if(paso === 'intro') cuerpo = `
+      <div class="si-eyebrow">Sistema interno</div>
+      <h2>Para avanzar en tu trabajo, primero tienes que estar bien contigo.</h2>
+      <p class="si-def"><em>${COSMOVISION_DEF}</em></p>
+      <p>Tu cosmovisión es tu mapa: cómo funcionas tú. Vamos a descubrir tus prioridades, qué haces para cuidar cada una y qué te regresa a tu centro cuando las cosas se ponen difíciles. Al final te llevas tu mapa.</p>`;
+    else if(paso === 'nombre') cuerpo = `
+      <div class="si-eyebrow">Tu centro</div>
+      <h2>¿Cómo te llamas?</h2>
+      <p>En el centro de tu mapa estás tú.</p>
+      <input class="si-input" data-s="nombre" value="${esc(S.nombre)}" placeholder="Tu nombre">`;
+    else if(paso === 'prioridades') cuerpo = `
+      <div class="si-eyebrow">Tus prioridades</div>
+      <h2>¿Qué es prioridad en tu vida?</h2>
+      <p>Elige las que quieras, o escribe las tuyas. Luego ordénalas: la número 1 es la más cercana a ti.</p>
+      <div class="chips si-chips">${SI_PRIORIDADES.map(p => `<button type="button" class="chip ${S.prioridades.some(x => x.nombre === p) ? 'on' : ''}" data-toggle="${esc(p)}">${esc(p)}</button>`).join('')}</div>
+      <div class="si-otra"><input class="si-input" id="si-otra" placeholder="Otra prioridad. Ej. Mi perro, el cine, mi comunidad"><button type="button" class="btn" data-agregar>Agregar</button></div>
+      <ol class="si-orden">${S.prioridades.map((p, i) => `
+        <li><span class="si-num" style="background:${siColor(i)}">${i + 1}</span><span class="si-nom">${esc(p.nombre)}</span>
+          <button type="button" data-subir="${i}" ${i === 0 ? 'disabled' : ''} title="Subir">↑</button>
+          <button type="button" data-bajar="${i}" ${i === S.prioridades.length - 1 ? 'disabled' : ''} title="Bajar">↓</button>
+          <button type="button" data-quitar="${i}" title="Quitar">✕</button></li>`).join('')}</ol>`;
+    else if(paso.startsWith('p')){
+      const i = +paso.slice(1), P = S.prioridades[i];
+      cuerpo = `
+        <div class="si-eyebrow"><span class="si-num" style="background:${siColor(i)}">${i + 1}</span> Prioridad ${i + 1} de ${S.prioridades.length} · ${esc(P.nombre)}</div>
+        <h2>${esc(siPregunta(P.nombre))}</h2>
+        <p>Escribe lo que haces, una cosa por renglón. Estas acciones son las que te mantienen bien en esta parte de tu vida.</p>
+        <textarea class="si-input si-area" data-accion="${i}" rows="6" placeholder="Ej. ${esc(siIdeas(P.nombre)[0])}">${esc((P.acciones || []).join('\n'))}</textarea>
+        <div class="si-ideas-tit">Ideas</div>
+        <div class="chips si-chips">${siIdeas(P.nombre).map(t => `<button type="button" class="chip" data-idea="${esc(t)}">+ ${esc(t)}</button>`).join('')}</div>`;
+    }
+    else if(paso === 'centro') cuerpo = `
+      <div class="si-eyebrow">Tu centro</div>
+      <h2>¿Qué te regresa a tu centro en un mal día?</h2>
+      <p>Eso que, cuando todo se complica, te devuelve a ti.</p>
+      <textarea class="si-input si-area" data-s="centro" rows="5" placeholder="Ej. Salir a caminar sin celular y escribir lo que siento.">${esc(S.centro)}</textarea>`;
+    else if(paso === 'exito') cuerpo = `
+      <div class="si-eyebrow">Tu definición</div>
+      <h2>¿Cuál es tu definición de éxito?</h2>
+      <p>Para cada persona es diferente. La tuya es solo tuya: tenla presente para no compararte con nadie. Va a acompañar tu mapa en la esquina.</p>
+      <textarea class="si-input si-area" data-s="exito" rows="4" placeholder="Ej. Hacer lo que amo, con tiempo para las personas que quiero.">${esc(S.exito)}</textarea>`;
+    else if(paso === 'resultado') cuerpo = `
+      <div class="si-eyebrow">Tu sistema interno</div>
+      <h2>La cosmovisión de ${esc(S.nombre)}</h2>
+      <div class="si-mapa" id="si-mapa"><div class="cargando">Dibujando tu mapa…</div></div>
+      <div class="si-acciones">
+        <button class="btn" data-pdf>📄 Descargar PDF</button>
+        <button class="btn ghost" data-fondo>📱 Fondo de pantalla</button>
+        <button class="btn ghost" data-editar>✏️ Editar</button>
+      </div>
+      <div class="si-lista">${S.prioridades.map((p, i) => `
+        <div class="si-item"><div class="si-item-tit"><span class="si-num" style="background:${siColor(i)}">${i + 1}</span>${esc(p.nombre)}</div>
+          <ul>${(p.acciones || []).map(a => `<li>${esc(a)}</li>`).join('') || '<li class="si-vacio">Sin acciones todavía</li>'}</ul></div>`).join('')}
+        ${S.centro ? `<div class="si-item"><div class="si-item-tit">Lo que me regresa a mi centro</div><p>${esc(S.centro)}</p></div>` : ''}
+      </div>`;
+
+    const ultimo = paso === 'exito';
+    bg.innerHTML = `
+      <div class="si-panel ${paso === 'resultado' ? 'ancho' : ''}">
+        <button class="si-x" data-cerrar title="Cerrar">✕</button>
+        ${progreso}
+        <div class="si-cuerpo">${cuerpo}</div>
+        ${paso === 'resultado' ? '' : `
+          <div class="si-pie">
+            ${idx > 0 ? '<button class="btn ghost" data-atras>← Atrás</button>' : '<span></span>'}
+            <button class="btn" data-sig>${paso === 'intro' ? 'Empezar' : ultimo ? 'Ver mi mapa ✨' : 'Siguiente →'}</button>
+          </div>`}
+      </div>`;
+    if(paso === 'resultado') pintarResultado();
+    const foco = bg.querySelector('.si-input'); if(foco && paso !== 'prioridades') foco.focus();
+  }
+
+  async function pintarResultado(){
+    await siFuentes();
+    const c = siPaginaMapa(S, 1000, 1000);
+    const cont = bg.querySelector('#si-mapa');
+    if(cont){ cont.innerHTML = ''; c.className = 'si-canvas'; cont.appendChild(c); }
+  }
+
+  function validar(){
+    if(paso === 'nombre' && !S.nombre.trim()){ toast('Escribe tu nombre'); return false; }
+    if(paso === 'prioridades' && !S.prioridades.length){ toast('Elige al menos una prioridad'); return false; }
+    return true;
+  }
+
+  async function guardarSistema(){
+    S.actualizado = new Date().toISOString();
+    const { data, error } = await sb.rpc('taller_guardar_sistema', { p_token: T.token, p_pin: T.pin, p_sistema: S });
+    if(pinRechazado(data)){ bg.remove(); document.body.style.overflow = ''; return; }
+    if(error){ toast('No se pudo guardar tu mapa. Revisa tu conexión.'); return; }
+    T.alumno.sistema = JSON.parse(JSON.stringify(S));
+  }
+
+  bg.addEventListener('input', e => {
+    const t = e.target;
+    if(t.dataset.s) S[t.dataset.s] = t.value;
+    if(t.dataset.accion !== undefined) S.prioridades[+t.dataset.accion].acciones = t.value.split('\n').map(x => x.trim()).filter(Boolean);
+  });
+  bg.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && e.target.id === 'si-otra'){ e.preventDefault(); bg.querySelector('[data-agregar]').click(); }
+  });
+  bg.addEventListener('click', async e => {
+    const t = e.target.closest('button');
+    if(!t) return;
+    const d = t.dataset;
+    if(d.cerrar !== undefined){ cerrar(); return; }
+    if(d.toggle){
+      const i = S.prioridades.findIndex(x => x.nombre === d.toggle);
+      if(i >= 0) S.prioridades.splice(i, 1); else S.prioridades.push({ nombre: d.toggle, acciones: [] });
+      render();
+    }
+    if(d.agregar !== undefined){
+      const inp = bg.querySelector('#si-otra');
+      const v = inp.value.trim();
+      if(v && !S.prioridades.some(x => x.nombre.toLowerCase() === v.toLowerCase())) S.prioridades.push({ nombre: v, acciones: [] });
+      render();
+      const otra = bg.querySelector('#si-otra'); if(otra) otra.focus();
+    }
+    const mover = (i, j) => { const [x] = S.prioridades.splice(i, 1); S.prioridades.splice(j, 0, x); render(); };
+    if(d.subir) mover(+d.subir, +d.subir - 1);
+    if(d.bajar) mover(+d.bajar, +d.bajar + 1);
+    if(d.quitar){ S.prioridades.splice(+d.quitar, 1); render(); }
+    if(d.idea){
+      const area = bg.querySelector('[data-accion]');
+      const i = +area.dataset.accion;
+      const acc = S.prioridades[i].acciones || [];
+      if(!acc.includes(d.idea)) acc.push(d.idea);
+      S.prioridades[i].acciones = acc;
+      area.value = acc.join('\n');
+      t.classList.add('on');
+    }
+    if(d.atras !== undefined){ const l = pasos(); paso = l[Math.max(0, l.indexOf(paso) - 1)]; render(); }
+    if(d.sig !== undefined){
+      if(!validar()) return;
+      const l = pasos(); paso = l[l.indexOf(paso) + 1];
+      if(paso === 'resultado') await guardarSistema();
+      render();
+    }
+    if(d.editar !== undefined){ paso = 'nombre'; render(); }
+    if(d.pdf !== undefined){ t.disabled = true; t.textContent = 'Preparando…'; await siDescargarPDF(S); t.disabled = false; t.textContent = '📄 Descargar PDF'; }
+    if(d.fondo !== undefined){ t.disabled = true; await siDescargarFondo(S); t.disabled = false; }
+  });
+  render();
+}
+
+// ---------- Dibujo (canvas) ----------
+let _siFuentes = null;
+function siFuentes(){
+  if(!_siFuentes) _siFuentes = Promise.all([
+    'italic 400 40px "Cormorant Garamond"', '600 40px "Cormorant Garamond"', '500 40px "Cormorant Garamond"', '600 20px Montserrat'
+  ].map(f => document.fonts.load(f).catch(() => null)));
+  return _siFuentes;
+}
+// Aleatorio con semilla: el mismo nombre siempre dibuja el mismo mapa
+function siRandom(semilla){
+  let h = 1779033703;
+  for(const ch of String(semilla)) h = Math.imul(h ^ ch.charCodeAt(0), 3432918353), h = h << 13 | h >>> 19;
+  return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; };
+}
+// Contorno orgánico, como el anillo de un tronco
+function siContorno(ctx, cx, cy, r, amp, rnd, reversa){
+  const f = [2 + Math.floor(rnd() * 2), 4 + Math.floor(rnd() * 3), 7 + Math.floor(rnd() * 4)];
+  const ph = f.map(() => rnd() * Math.PI * 2);
+  const pts = 160;
+  for(let k = 0; k <= pts; k++){
+    const a = (reversa ? -1 : 1) * k / pts * Math.PI * 2;
+    const rr = r + amp * (Math.sin(f[0] * a + ph[0]) * .55 + Math.sin(f[1] * a + ph[1]) * .3 + Math.sin(f[2] * a + ph[2]) * .15);
+    const x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a);
+    if(k === 0 && !reversa) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+function siHexA(hex, a){ const v = parseInt(hex.slice(1), 16); return `rgba(${v >> 16},${(v >> 8) & 255},${v & 255},${a})`; }
+function siGrano(ctx, w, h, rnd){
+  const n = document.createElement('canvas'); n.width = n.height = 160;
+  const nc = n.getContext('2d'), img = nc.createImageData(160, 160);
+  for(let i = 0; i < img.data.length; i += 4){ const v = 90 + rnd() * 90; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = rnd() * 22; }
+  nc.putImageData(img, 0, 0);
+  ctx.save(); ctx.fillStyle = ctx.createPattern(n, 'repeat'); ctx.fillRect(0, 0, w, h); ctx.restore();
+}
+function siTexto(ctx, txt, x, y, ancho, alto, alinear){
+  // Escribe con saltos de línea automáticos; devuelve la y final
+  const lineas = [];
+  String(txt).split('\n').forEach(par => {
+    let l = '';
+    par.split(' ').forEach(p => { const prueba = l ? l + ' ' + p : p; if(ctx.measureText(prueba).width > ancho && l){ lineas.push(l); l = p; } else l = prueba; });
+    lineas.push(l);
+  });
+  ctx.textAlign = alinear || 'left';
+  lineas.forEach((l, i) => ctx.fillText(l, x, y + i * alto));
+  return y + lineas.length * alto;
+}
+function siLineasDe(ctx, txt, ancho){ let n = 0; String(txt).split('\n').forEach(par => { let l = ''; par.split(' ').forEach(p => { const pr = l ? l + ' ' + p : p; if(ctx.measureText(pr).width > ancho && l){ n++; l = p; } else l = pr; }); n++; }); return n; }
+
+// El mapa: nombre al centro y un anillo por prioridad
+function siDibujarMapa(ctx, S, x0, y0, tam){
+  const s = tam / 1000, cx = x0 + tam / 2, cy = y0 + tam / 2;
+  const n = Math.max(1, S.prioridades.length);
+  const r0 = 120 * s, rMax = 470 * s, w = (rMax - r0) / n;
+  const rnd = siRandom(S.nombre + n);
+  ctx.save();
+  // Acuarela de cada anillo (varias capas translúcidas con bordes que no coinciden)
+  ctx.globalCompositeOperation = 'multiply';
+  for(let i = n - 1; i >= 0; i--){
+    const col = siColor(i);
+    for(let capa = 0; capa < 4; capa++){
+      ctx.beginPath();
+      siContorno(ctx, cx + (rnd() - .5) * 8 * s, cy + (rnd() - .5) * 8 * s, r0 + w * (i + 1) + (rnd() - .3) * 6 * s, 9 * s, rnd);
+      siContorno(ctx, cx, cy, r0 + w * i + 4 * s, 7 * s, rnd, true);
+      ctx.fillStyle = siHexA(col, .13 + rnd() * .06);
+      ctx.fill('evenodd');
+    }
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  // Líneas de tinta, como los anillos de crecimiento
+  for(let i = 0; i < n; i++){
+    const lineas = Math.max(2, Math.min(5, Math.round(w / (14 * s))));
+    for(let j = 1; j <= lineas; j++){
+      ctx.beginPath();
+      siContorno(ctx, cx, cy, r0 + w * i + w * j / (lineas + 1), (3 + rnd() * 4) * s, rnd);
+      ctx.strokeStyle = siHexA('#2b2620', .22 + rnd() * .18); ctx.lineWidth = (0.8 + rnd() * .7) * s; ctx.stroke();
+    }
+    ctx.beginPath();
+    siContorno(ctx, cx, cy, r0 + w * (i + 1), 6 * s, rnd);
+    ctx.strokeStyle = siHexA('#2b2620', .75); ctx.lineWidth = 2 * s; ctx.stroke();
+  }
+  // Corazón del tronco y nombre
+  ctx.beginPath(); siContorno(ctx, cx, cy, r0, 4 * s, rnd); ctx.fillStyle = SI_PAPEL; ctx.fill();
+  ctx.strokeStyle = siHexA('#2b2620', .85); ctx.lineWidth = 2.2 * s; ctx.stroke();
+  for(let k = 1; k <= 3; k++){ ctx.beginPath(); siContorno(ctx, cx, cy, r0 * (1 - k * .07), 2.5 * s, rnd); ctx.strokeStyle = siHexA('#2b2620', .12); ctx.lineWidth = s; ctx.stroke(); }
+  ctx.fillStyle = siHexA('#2b2620', .55); ctx.font = `600 ${15 * s}px Montserrat`; ctx.textAlign = 'center';
+  ctx.fillText('C E N T R O', cx, cy - 30 * s);
+  ctx.fillStyle = SI_TINTA;
+  let tamNom = 62 * s; ctx.font = `italic 500 ${tamNom}px "Cormorant Garamond"`;
+  while(ctx.measureText(S.nombre).width > r0 * 1.7 && tamNom > 24 * s){ tamNom -= 2 * s; ctx.font = `italic 500 ${tamNom}px "Cormorant Garamond"`; }
+  ctx.fillText(S.nombre, cx, cy + tamNom * .35 + 8 * s);
+  // En cada anillo: su nombre y, siguiendo la curva, lo que haces para cuidarlo
+  const base = -Math.PI / 2;
+  S.prioridades.forEach((p, i) => {
+    const a = base + i * 0.9;
+    const rm = r0 + w * (i + .5);
+    const px = cx + rm * Math.cos(a), py = cy + rm * Math.sin(a);
+    const etq = `${i + 1} · ${p.nombre}`;
+    const fe = Math.min(26 * s, w * .5);
+    ctx.font = `600 ${fe}px "Cormorant Garamond"`;
+    const tw = ctx.measureText(etq).width;
+    // Texto curvo con las acciones
+    const acc = (p.acciones || []).join('   ·   ');
+    if(acc){
+      const hueco = (tw / 2 + 18 * s) / rm;
+      const disponible = Math.PI * 2 * rm - 2 * hueco * rm;
+      let fs = Math.min(21 * s, w * .42), txt = acc;
+      ctx.font = `italic 500 ${fs}px "Cormorant Garamond"`;
+      while(ctx.measureText(txt).width > disponible && fs > 11 * s){ fs -= .5 * s; ctx.font = `italic 500 ${fs}px "Cormorant Garamond"`; }
+      while(ctx.measureText(txt).width > disponible && txt.length > 3) txt = txt.slice(0, -2).trimEnd() + '…';
+      // Centramos el texto en el espacio que queda libre del anillo
+      let ang = a + hueco + (disponible - ctx.measureText(txt).width) / 2 / rm;
+      ctx.fillStyle = SI_TINTA; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for(const ch of txt){
+        const cw = ctx.measureText(ch).width, mid = ang + cw / 2 / rm;
+        ctx.save();
+        ctx.translate(cx + rm * Math.cos(mid), cy + rm * Math.sin(mid));
+        ctx.rotate(mid + Math.PI / 2);
+        ctx.fillText(ch, 0, 0);
+        ctx.restore();
+        ang += cw / rm;
+      }
+      ctx.textBaseline = 'alphabetic';
+    }
+    // Etiqueta con el nombre de la prioridad
+    ctx.font = `600 ${fe}px "Cormorant Garamond"`;
+    ctx.fillStyle = siHexA(SI_PAPEL, .95);
+    ctx.beginPath(); ctx.roundRect(px - tw / 2 - 12 * s, py - fe * .75, tw + 24 * s, fe * 1.4, fe * .7); ctx.fill();
+    ctx.strokeStyle = siColor(i); ctx.lineWidth = 2 * s; ctx.stroke();
+    ctx.fillStyle = SI_TINTA; ctx.textAlign = 'center'; ctx.fillText(etq, px, py + fe * .3);
+  });
+  ctx.restore();
+}
+function siFondo(ctx, w, h, rnd){ ctx.fillStyle = SI_PAPEL; ctx.fillRect(0, 0, w, h); siGrano(ctx, w, h, rnd); }
+function siExito(ctx, S, derecha, abajo, ancho, escala){
+  if(!S.exito) return;
+  ctx.font = `italic 400 ${34 * escala}px "Cormorant Garamond"`;
+  const n = siLineasDe(ctx, S.exito, ancho), alto = 40 * escala;
+  const y = abajo - (n - 1) * alto;
+  ctx.fillStyle = siHexA('#2b2620', .55); ctx.font = `600 ${14 * escala}px Montserrat`; ctx.textAlign = 'right';
+  ctx.fillText('MI DEFINICIÓN DE ÉXITO', derecha, y - 44 * escala);
+  ctx.strokeStyle = siHexA('#c8613a', .8); ctx.lineWidth = 2 * escala;
+  ctx.beginPath(); ctx.moveTo(derecha - 60 * escala, y - 30 * escala); ctx.lineTo(derecha, y - 30 * escala); ctx.stroke();
+  ctx.fillStyle = SI_TINTA; ctx.font = `italic 400 ${34 * escala}px "Cormorant Garamond"`;
+  siTexto(ctx, S.exito, derecha, y, ancho, alto, 'right');
+}
+function siPaginaMapa(S, w, h){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  siFondo(ctx, w, h, siRandom('papel'));
+  siDibujarMapa(ctx, S, 0, 0, Math.min(w, h));
+  return c;
+}
+
+// Hojas del PDF (tamaño carta a 150 dpi)
+function siHojas(S){
+  const W = 1275, H = 1650, M = 110, hojas = [];
+  const nueva = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; const ctx = c.getContext('2d'); siFondo(ctx, W, H, siRandom('papel' + hojas.length)); hojas.push(c); encabezado(ctx); return ctx; };
+  const encabezado = ctx => {
+    ctx.fillStyle = siHexA('#2b2620', .55); ctx.font = '600 15px Montserrat';
+    ctx.textAlign = 'left'; ctx.fillText('S I S T E M A   I N T E R N O', M, 90);
+    ctx.textAlign = 'right'; ctx.fillText('O R G A N I Z A   T U S   P R O Y E C T O S', W - M, 90);
+  };
+  // Hoja 1: definición, mapa y éxito
+  let ctx = nueva();
+  ctx.fillStyle = SI_TINTA; ctx.textAlign = 'left';
+  ctx.font = 'italic 400 46px "Cormorant Garamond"'; ctx.fillText('La cosmovisión de', M, 190);
+  ctx.font = '600 104px "Cormorant Garamond"'; ctx.fillText(S.nombre, M, 290);
+  ctx.fillStyle = '#4a443c'; ctx.font = 'italic 400 27px "Cormorant Garamond"';
+  let y = siTexto(ctx, COSMOVISION_DEF + ' Este es tu mapa: cómo funcionas tú.', M, 350, W - 2 * M, 36);
+  const tam = Math.min(1000, H - y - 300);
+  siDibujarMapa(ctx, S, (W - tam) / 2, y + 10, tam);
+  siExito(ctx, S, W - M, H - 110, 620, 1);
+  // Hojas siguientes: cada prioridad con lo que haces para cuidarla, en dos columnas
+  ctx = nueva();
+  ctx.fillStyle = SI_TINTA; ctx.textAlign = 'left'; ctx.font = '600 76px "Cormorant Garamond"'; ctx.fillText('Mis prioridades', M, 210);
+  const colW = (W - 2 * M - 70) / 2, limite = H - 300;
+  let col = 0, top = 300;
+  y = top;
+  const bloque = (titulo, color, renglones, num) => {
+    ctx.font = 'italic 400 28px "Cormorant Garamond"';
+    ctx.font = '600 42px "Cormorant Garamond"';
+    const lt = siLineasDe(ctx, titulo, colW - (color ? 66 : 0));
+    ctx.font = 'italic 400 28px "Cormorant Garamond"';
+    const alto = lt * 48 + 12 + renglones.reduce((acc, r) => acc + siLineasDe(ctx, r, colW - 100) * 35, 0) + 40;
+    if(y + alto > limite){
+      if(col === 0){ col = 1; y = top; }
+      else { siExito(ctx, S, W - M, H - 110, 620, .8); ctx = nueva(); col = 0; top = 200; y = top; }
+    }
+    const x = M + col * (colW + 70);
+    if(color){
+      ctx.globalCompositeOperation = 'multiply';
+      const rnd = siRandom(titulo);
+      for(let k = 0; k < 3; k++){ ctx.beginPath(); siContorno(ctx, x + 22, y - 13, 24 + rnd() * 4, 3, rnd); ctx.fillStyle = siHexA(color, .3); ctx.fill(); }
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = SI_TINTA; ctx.font = '600 22px Montserrat'; ctx.textAlign = 'center'; ctx.fillText(String(num), x + 22, y - 5);
+    }
+    ctx.fillStyle = SI_TINTA; ctx.font = '600 42px "Cormorant Garamond"';
+    y = siTexto(ctx, titulo, color ? x + 66 : x, y, colW - (color ? 66 : 0), 48, 'left') + 4;
+    ctx.font = 'italic 400 28px "Cormorant Garamond"'; ctx.fillStyle = '#3d3831';
+    renglones.forEach(r => { ctx.textAlign = 'left'; ctx.fillText('—', x + 66, y); y = siTexto(ctx, r, x + 100, y, colW - 100, 35, 'left'); });
+    y += 40;
+  };
+  S.prioridades.forEach((p, i) => bloque(p.nombre, siColor(i), (p.acciones && p.acciones.length) ? p.acciones : ['(Todavía no escribes qué haces para cuidarlo)'], i + 1));
+  if(S.centro) bloque('Lo que me regresa a mi centro', null, [S.centro]);
+  siExito(ctx, S, W - M, H - 110, 620, .8);
+  return hojas;
+}
+
+async function siDescargarPDF(S){
+  let jsPDF;
+  try { [jsPDF] = await Promise.all([cargarJsPDF(), siFuentes()]); }
+  catch(e){ toast('No se pudo preparar el PDF. Revisa tu conexión.'); return; }
+  const doc = new jsPDF({ unit:'pt', format:'letter' });
+  siHojas(S).forEach((c, i) => {
+    if(i) doc.addPage();
+    doc.addImage(c.toDataURL('image/jpeg', .9), 'JPEG', 0, 0, 612, 792);
+  });
+  await siEntregar(doc.output('blob'), siArchivo('Sistema interno ' + S.nombre, 'pdf'), 'application/pdf');
+}
+async function siDescargarFondo(S){
+  await siFuentes();
+  const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  siFondo(ctx, W, H, siRandom('fondo'));
+  ctx.fillStyle = siHexA('#2b2620', .55); ctx.font = '600 22px Montserrat'; ctx.textAlign = 'center';
+  ctx.fillText('M I   S I S T E M A   I N T E R N O', W / 2, 250);
+  siDibujarMapa(ctx, S, 40, 360, W - 80);
+  siExito(ctx, S, W - 80, H - 240, 760, 1.25);
+  const blob = await new Promise(ok => c.toBlob(ok, 'image/png'));
+  await siEntregar(blob, siArchivo('Fondo sistema interno ' + S.nombre, 'png'), 'image/png');
+}
+const siArchivo = (nombre, ext) => nombre.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w -]/g, '').trim().replace(/\s+/g, '-') + '.' + ext;
+async function siEntregar(blob, nombre, tipo){
+  const archivo = new File([blob], nombre, { type: tipo });
+  if(window.matchMedia('(pointer:coarse)').matches && navigator.canShare && navigator.canShare({ files:[archivo] })){
+    try { await navigator.share({ files:[archivo], title:nombre }); return; }
+    catch(e){ if(e.name === 'AbortError') return; }
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
