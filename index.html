@@ -133,6 +133,12 @@
   .modal-pie{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap;}
   .modal-pie .der{display:flex;gap:8px;margin-left:auto;}
 
+  .aviso{max-width:560px;margin:6vh auto 0;background:#fff;border:1px solid var(--linea);border-radius:18px;padding:28px 26px;}
+  .aviso h1{font-size:1.6rem;font-weight:800;margin:8px 0 14px;}
+  .aviso p, .aviso li, .aviso-modal p, .aviso-modal li{font-size:0.92rem;line-height:1.6;color:#3d3a35;}
+  .aviso ul, .aviso-modal ul{padding-left:20px;margin:8px 0 16px;}
+  .aviso li, .aviso-modal li{margin-bottom:8px;}
+  .aviso-acepta{background:var(--hueso);border-radius:10px;padding:12px 14px;margin:0 0 16px;}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--negro);color:#fff;padding:11px 18px;border-radius:10px;font-size:0.88rem;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.2);}
   .cargando{text-align:center;color:var(--gris);padding:60px 20px;}
 
@@ -267,7 +273,49 @@ async function abrirTablero(token, adminVolver){
   }
   T.alumno = data.alumno;
   T.proyectos = data.proyectos || [];
-  renderTablero();
+  // El alumno ve el aviso de privacidad hasta que lo acepta (tú, desde el panel, no lo ves)
+  if(!T.adminVolver && !T.alumno.acepto_privacidad) mostrarAvisoPrivacidad();
+  else renderTablero();
+}
+
+const TEXTO_AVISO = `
+  <p>Antes de empezar, queremos ser claros contigo:</p>
+  <ul>
+    <li>La información que registres en este tablero (proyectos, clientes, montos y cobranza) se guarda en una base de datos administrada por <strong>Level Producer</strong> y puede ser vista por <strong>Sofía Loarca</strong>, quien imparte el taller, para acompañarte y darte retroalimentación.</li>
+    <li>Siempre cuidaremos los datos de tu agencia y de tu cobranza. <strong>No los compartimos con nadie, no los vendemos y no hacemos ningún otro uso de ellos.</strong></li>
+    <li>Puedes pedir que borremos tu tablero y toda tu información cuando quieras.</li>
+  </ul>`;
+
+function mostrarAvisoPrivacidad(){
+  app.innerHTML = `
+    <div class="aviso">
+      <div class="hero-marca">Organiza tus proyectos</div>
+      <h1>🔒 Aviso de privacidad</h1>
+      ${TEXTO_AVISO}
+      <p class="aviso-acepta">Al dar clic en <strong>Acepto</strong>, aceptas que la información de tu tablero sea vista por Level Producer en los términos de este aviso.</p>
+      <button class="btn" id="b-acepto" style="width:100%;">Acepto, ir a mi tablero</button>
+    </div>`;
+  document.getElementById('b-acepto').addEventListener('click', async e => {
+    e.target.disabled = true; e.target.textContent = 'Un momento…';
+    const { data, error } = await sb.rpc('taller_aceptar_privacidad', { p_token: T.token });
+    if(error){
+      e.target.disabled = false; e.target.textContent = 'Acepto, ir a mi tablero';
+      toast('No se pudo guardar. Revisa tu conexión.');
+      return;
+    }
+    T.alumno.acepto_privacidad = data;
+    renderTablero();
+  });
+}
+
+function verAvisoPrivacidad(){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal aviso-modal"><h3>🔒 Aviso de privacidad</h3>${TEXTO_AVISO}
+    <p class="ayuda">Aceptado el ${new Date(T.alumno.acepto_privacidad).toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' })}.</p>
+    <div class="modal-pie"><div class="der"><button class="btn" data-cerrar>Cerrar</button></div></div></div>`;
+  document.body.appendChild(bg);
+  bg.addEventListener('click', e => { if(e.target === bg || e.target.closest('[data-cerrar]')) bg.remove(); });
 }
 
 function renderTablero(destacarId){
@@ -335,7 +383,10 @@ function renderTablero(destacarId){
       </ol>
       <p class="ayuda" style="margin-bottom:14px;">Tip: en computadora también puedes arrastrar las tarjetas de una columna a otra.</p>
     </details>
+    ${T.alumno.acepto_privacidad ? '<p class="ayuda" style="text-align:center;margin-top:18px;"><a href="#" id="b-aviso" style="color:inherit;">🔒 Aviso de privacidad</a></p>' : ''}
   `;
+  const bAviso = document.getElementById('b-aviso');
+  if(bAviso) bAviso.addEventListener('click', e => { e.preventDefault(); verAvisoPrivacidad(); });
 
   app.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => {
     document.getElementById('sec-' + b.dataset.ir).scrollIntoView({ behavior:'smooth' });
@@ -732,7 +783,7 @@ function renderAdmin(){
           <div class="avatar">${esc(iniciales(a.nombre))}</div>
           <div class="alumno-info">
             <div class="alumno-nombre">${esc(a.nombre)}</div>
-            <div class="alumno-sub">${a.proyectos_propios} ${a.proyectos_propios == 1 ? 'proyecto' : 'proyectos'} · ${haceCuanto(a.ultimo_acceso)}</div>
+            <div class="alumno-sub">${a.proyectos_propios} ${a.proyectos_propios == 1 ? 'proyecto' : 'proyectos'} · ${haceCuanto(a.ultimo_acceso)} · ${a.acepto_privacidad ? '🔒 aceptó aviso' : 'sin aceptar aviso'}</div>
           </div>
           <button class="icono" data-copiar="${a.id}" title="Copiar link">🔗</button>
           <button class="icono" data-wa="${a.id}" title="Mandar por WhatsApp">💬</button>
