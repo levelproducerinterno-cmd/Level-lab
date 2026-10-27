@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mis proyectos">
 <meta name="theme-color" content="#f7f5f2">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>Organiza tus proyectos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,6 +40,7 @@
 
   /* ---------- Encabezado ---------- */
   .hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+  .logo{display:inline-block;height:42px;width:auto;margin-bottom:10px;}
   .hero-marca{font-size:0.7rem;letter-spacing:0.22em;font-weight:700;color:var(--gris);text-transform:uppercase;}
   .hero h1{font-size:2rem;font-weight:800;margin:6px 0 4px;letter-spacing:-0.02em;}
   .hero p{margin:0;color:#5b574f;font-size:0.95rem;max-width:620px;line-height:1.5;}
@@ -297,6 +300,7 @@ async function abrirTablero(token, pin){
 function pantallaPin({ titulo, texto, boton, msg, bloqueado, confirmar, alEnviar }){
   app.innerHTML = `
     <div class="aviso" style="max-width:420px;text-align:center;">
+      <img class="logo" src="/logo-levellab.png" alt="Level Lab">
       <div class="hero-marca">Organiza tus proyectos</div>
       <h1>${titulo}</h1>
       <p>${texto}</p>
@@ -370,6 +374,7 @@ const TEXTO_AVISO = `
 function mostrarAvisoPrivacidad(){
   app.innerHTML = `
     <div class="aviso">
+      <img class="logo" src="/logo-levellab.png" alt="Level Lab">
       <div class="hero-marca">Organiza tus proyectos</div>
       <h1>Aviso de privacidad</h1>
       ${TEXTO_AVISO}
@@ -411,6 +416,7 @@ function renderTablero(destacarId){
   app.innerHTML = `
     <div class="hero">
       <div>
+        <img class="logo" src="/logo-levellab.png" alt="Level Lab">
         <div class="hero-marca">Organiza tus proyectos</div>
         <h1>Hola, ${esc(primerNombre)} 👋</h1>
         <p>Tu negocio en tres pasos. Cada proyecto entra por <strong>Ventas</strong>, pasa por <strong>Producción</strong> y termina en <strong>Cobranza</strong>. Tú solo das clic en el siguiente paso.</p>
@@ -787,6 +793,7 @@ function guardarClave(c){ CLAVE = c; try { c ? localStorage.setItem(CLAVE_KEY, c
 function mostrarEntrada(msg){
   app.innerHTML = `
     <div style="max-width:380px;margin:12vh auto 0;text-align:center;">
+      <img class="logo" src="/logo-levellab.png" alt="Level Lab">
       <div class="hero-marca">Taller</div>
       <h1 style="font-size:1.9rem;font-weight:800;margin:8px 0 6px;">Organiza tus proyectos</h1>
       <p class="ayuda" style="font-size:0.88rem;margin-bottom:22px;">¿Eres alumno? Abre el link personal que te compartieron.</p>
@@ -839,6 +846,7 @@ function renderAdmin(){
   app.innerHTML = `
     <div class="hero">
       <div>
+        <img class="logo" src="/logo-levellab.png" alt="Level Lab">
         <div class="hero-marca">Taller</div>
         <h1>Organiza tus proyectos</h1>
         <p>Da de alta a cada persona que se registre. Cada quien recibe su propio link y crea un PIN para entrar: su tablero es solo suyo. Si alguien olvida su PIN, reinícialo con 🔑.</p>
