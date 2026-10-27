@@ -138,7 +138,9 @@
   .aviso p, .aviso li, .aviso-modal p, .aviso-modal li{font-size:0.92rem;line-height:1.6;color:#3d3a35;}
   .aviso ul, .aviso-modal ul{padding-left:20px;margin:8px 0 16px;}
   .aviso li, .aviso-modal li{margin-bottom:8px;}
-  .aviso-acepta{background:var(--hueso);border-radius:10px;padding:12px 14px;margin:0 0 16px;}
+  .aviso h4, .aviso-modal h4{font-size:0.95rem;font-weight:700;margin:18px 0 4px;color:var(--texto);}
+  .aviso p, .aviso-modal p{margin:0 0 6px;}
+  .aviso-acepta{margin:20px 0 16px !important;background:var(--hueso);border-radius:10px;padding:12px 14px;}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--negro);color:#fff;padding:11px 18px;border-radius:10px;font-size:0.88rem;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.2);}
   .cargando{text-align:center;color:var(--gris);padding:60px 20px;}
 
@@ -279,20 +281,23 @@ async function abrirTablero(token, adminVolver){
 }
 
 const TEXTO_AVISO = `
-  <p>Antes de empezar, queremos ser claros contigo:</p>
-  <ul>
-    <li>La información que registres en este tablero (proyectos, clientes, montos y cobranza) se guarda en una base de datos administrada por <strong>Level Producer</strong> y puede ser vista por <strong>Sofía Loarca</strong>, quien imparte el taller, para acompañarte y darte retroalimentación.</li>
-    <li>Siempre cuidaremos los datos de tu agencia y de tu cobranza. <strong>No los compartimos con nadie, no los vendemos y no hacemos ningún otro uso de ellos.</strong></li>
-    <li>Puedes pedir que borremos tu tablero y toda tu información cuando quieras.</li>
-  </ul>`;
+  <p>¡Qué gusto tenerte en el taller! Este tablero es tuyo: aquí vas a organizar tus proyectos, tus clientes y tus cobros para que tu negocio camine con más orden y más tranquilidad.</p>
+  <h4>¿Quién puede ver tu tablero?</h4>
+  <p>Tú, y Sofía Loarca, quien te acompaña en el taller. Poder ver cómo vas le permite darte consejos más útiles, resolver tus dudas con ejemplos reales y ayudarte a encontrar oportunidades en tus ventas y en tu cobranza.</p>
+  <h4>¿Para qué se usa tu información?</h4>
+  <p>Solo para acompañarte durante tu proceso. No la compartimos con nadie, no la vendemos y no la usamos para contactar a tus clientes ni para ningún otro fin.</p>
+  <h4>¿Cómo la cuidamos?</h4>
+  <p>Tu tablero se guarda de forma privada en la plataforma de Level Producer y solo se abre con tu link personal. Por eso te recomendamos guardarlo para ti.</p>
+  <h4>Tú decides</h4>
+  <p>Si en algún momento quieres que borremos tu tablero y toda tu información, solo pídelo y lo hacemos, sin preguntas.</p>`;
 
 function mostrarAvisoPrivacidad(){
   app.innerHTML = `
     <div class="aviso">
-      <div class="hero-marca">Organiza tus proyectos</div>
-      <h1>🔒 Aviso de privacidad</h1>
+      <div class="hero-marca">Organiza tus proyectos · Aviso de privacidad</div>
+      <h1>Tu información, en buenas manos 🤝</h1>
       ${TEXTO_AVISO}
-      <p class="aviso-acepta">Al dar clic en <strong>Acepto</strong>, aceptas que la información de tu tablero sea vista por Level Producer en los términos de este aviso.</p>
+      <p class="aviso-acepta">Al dar clic en <strong>Acepto</strong>, nos das permiso para que Sofía Loarca y el equipo de Level Producer puedan ver tu tablero, con el único fin de acompañarte en el taller.</p>
       <button class="btn" id="b-acepto" style="width:100%;">Acepto, ir a mi tablero</button>
     </div>`;
   document.getElementById('b-acepto').addEventListener('click', async e => {
@@ -311,7 +316,7 @@ function mostrarAvisoPrivacidad(){
 function verAvisoPrivacidad(){
   const bg = document.createElement('div');
   bg.className = 'modal-bg';
-  bg.innerHTML = `<div class="modal aviso-modal"><h3>🔒 Aviso de privacidad</h3>${TEXTO_AVISO}
+  bg.innerHTML = `<div class="modal aviso-modal"><h3>Tu información, en buenas manos 🤝</h3>${TEXTO_AVISO}
     <p class="ayuda">Aceptado el ${new Date(T.alumno.acepto_privacidad).toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' })}.</p>
     <div class="modal-pie"><div class="der"><button class="btn" data-cerrar>Cerrar</button></div></div></div>`;
   document.body.appendChild(bg);
