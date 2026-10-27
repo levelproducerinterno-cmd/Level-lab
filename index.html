@@ -192,6 +192,23 @@
   .cot-total span{font-size:0.8rem;font-weight:700;color:#146b3a;}
   .cot-total strong{font-size:1.4rem;color:#146b3a;}
   .cot-total em{font-size:0.78rem;font-style:normal;color:#146b3a;width:100%;}
+  .hero-acciones{display:flex;gap:8px;align-items:center;}
+  .cotizar-fila{display:flex;gap:6px;}
+  .cotizar-fila .cotizar.pdf{flex:0 0 auto;width:auto;}
+  .cot-tip{display:block;font-weight:500;margin-top:3px;}
+  .cot-textarea{width:100%;border:1px solid var(--linea);border-radius:9px;padding:10px 12px;font-size:16px;font-family:inherit;resize:vertical;}
+  .link{background:none;border:none;padding:4px 0;color:var(--gris);font-size:0.8rem;font-weight:600;text-decoration:underline;}
+  .cot-marca{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--hueso);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:0.85rem;}
+  .cot-marca img{height:28px;width:auto;max-width:90px;object-fit:contain;}
+  .cot-marca span{flex:1;}
+  .cot-marca.falta{background:#fff8e0;}
+  .neg-logo{display:flex;gap:12px;align-items:center;}
+  .neg-logo-prev{width:150px;height:80px;border:1.5px dashed #d0c9bb;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden;}
+  .neg-logo-prev img{max-width:90%;max-height:90%;object-fit:contain;}
+  .neg-logo-prev span{font-size:0.8rem;color:#aaa49a;}
+  .color-chip{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--linea);}
+  .color-chip.on{box-shadow:0 0 0 2px var(--negro);}
+  #n-color{width:34px;height:34px;border:none;background:none;padding:0;}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--negro);color:#fff;padding:11px 18px;border-radius:10px;font-size:0.88rem;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.2);}
   .cargando{text-align:center;color:var(--gris);padding:60px 20px;}
 
@@ -232,6 +249,7 @@
     .columnas{grid-auto-columns:82%;}
     .alta{grid-template-columns:1fr;}
     .fila2{grid-template-columns:1fr;}
+    .hero-acciones{width:100%;}
     .hero .btn-nuevo{position:fixed;right:16px;bottom:18px;z-index:50;border-radius:30px;padding:15px 20px;box-shadow:0 6px 20px rgba(0,0,0,.25);}
   }
 </style>
@@ -493,7 +511,10 @@ function renderTablero(destacarId){
         <h1>Hola, ${esc(primerNombre)} 👋</h1>
         <p>Tu negocio en tres pasos. Cada proyecto entra por <strong>Ventas</strong>, pasa por <strong>Producción</strong> y termina en <strong>Cobranza</strong>. Tú solo das clic en el siguiente paso.</p>
       </div>
-      <button class="btn btn-nuevo" id="b-nuevo">+ Nuevo proyecto</button>
+      <div class="hero-acciones">
+        <button class="btn ghost" id="b-negocio">🏷️ Mi negocio</button>
+        <button class="btn btn-nuevo" id="b-nuevo">+ Nuevo proyecto</button>
+      </div>
     </div>
 
     <nav class="recorrido">
@@ -527,6 +548,7 @@ function renderTablero(destacarId){
       <ol>
         <li><strong>Te piden una cotización:</strong> da clic en <em>+ Nuevo proyecto</em>. Aparece en Ventas como Prospecto.</li>
         <li><strong>Cotizas:</strong> en la tarjeta, clic en <em>🧮 Cotizar</em>. Anota quién va, cuánto le pagas a cada quien, tu pago, edición y gastos: el sistema te dice cuánto te cuesta y cuánto cobrar. Puedes armar hasta 3 paquetes.</li>
+        <li><strong>Tu marca:</strong> en <em>🏷️ Mi negocio</em> sube tu logo y tus datos una sola vez. Desde la cotización descargas el PDF con tu marca, listo para mandar.</li>
         <li><strong>Mandas la cotización:</strong> clic en <em>Envié la cotización</em>.</li>
         <li><strong>Te pagan el anticipo:</strong> clic en <em>Me pagó el anticipo</em> y escribe cuánto te dieron. Baja a Producción.</li>
         <li><strong>Avanzas:</strong> Preproducción → Producción → Edición. En edición, mueve la barra según el paso en el que vas. El avance se calcula solo.</li>
@@ -558,6 +580,7 @@ function renderTablero(destacarId){
     document.getElementById('sec-' + b.dataset.ir).scrollIntoView({ behavior:'smooth' });
   }));
   document.getElementById('b-nuevo').addEventListener('click', () => abrirEditor(null));
+  document.getElementById('b-negocio').addEventListener('click', () => abrirMiNegocio());
   const bEj = document.getElementById('b-borrar-ejemplos');
   if(bEj) bEj.addEventListener('click', borrarEjemplos);
   conectarTarjetas();
@@ -642,7 +665,10 @@ function renderCard(p, s){
         </div>` : ''}
       ${p.etapa === 'entregado' ? `<div class="debe">Te debe <strong>${dinero(saldo(p))}</strong> de ${dinero(p.monto_total)}</div>` : ''}
       ${s.key === 'ventas' && p.etapa !== 'perdido' ? `
-        <button class="cotizar" data-stop data-cotizar>${p.cotizacion ? `🧮 Ver cotización${p.cotizacion.paquetes.length > 1 ? ' · ' + p.cotizacion.paquetes.length + ' paquetes' : ''}` : '🧮 Cotizar'}</button>` : ''}
+        <div class="cotizar-fila" data-stop>
+          <button class="cotizar" data-cotizar>${p.cotizacion ? `🧮 Ver cotización${p.cotizacion.paquetes.length > 1 ? ' · ' + p.cotizacion.paquetes.length + ' paquetes' : ''}` : '🧮 Cotizar'}</button>
+          ${p.cotizacion ? '<button class="cotizar pdf" data-pdf-card title="Descargar PDF">📄 PDF</button>' : ''}
+        </div>` : ''}
       ${sig ? `
         <div class="card-acciones" data-stop>
           <button class="accion" data-mover="${sig.a}">${sig.txt}</button>
@@ -660,6 +686,12 @@ function conectarTarjetas(){
     card.querySelectorAll('[data-mover]').forEach(b => b.addEventListener('click', () => moverA(p, b.dataset.mover)));
     const bCot = card.querySelector('[data-cotizar]');
     if(bCot) bCot.addEventListener('click', () => abrirCotizador(p));
+    const bPdf = card.querySelector('[data-pdf-card]');
+    if(bPdf) bPdf.addEventListener('click', async () => {
+      bPdf.disabled = true;
+      await descargarPDF(p, p.cotizacion);
+      bPdf.disabled = false;
+    });
 
     // Arrastrar entre columnas (computadora)
     card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', p.id); card.classList.add('arrastrando'); });
@@ -818,6 +850,13 @@ function abrirCotizador(p){
     elegido: 0,
     paquetes: [ paqueteDesdePlantilla(tipoInicial || 'Otro', 'Paquete 1') ]
   };
+  const hoy = new Date();
+  C.pdf = {
+    folio: `${String(hoy.getFullYear()).slice(2)}${String(hoy.getMonth() + 1).padStart(2, '0')}${String(hoy.getDate()).padStart(2, '0')}-${String(p.id).slice(0, 4).toUpperCase()}`,
+    fecha_evento: p.fecha_entrega || '', vigencia: 15,
+    notas: 'Para apartar la fecha se requiere el 50% de anticipo. El resto se liquida a la entrega.',
+    ...(C.pdf || {})
+  };
   let actual = 0;
   const bg = document.createElement('div');
   bg.className = 'modal-bg';
@@ -915,15 +954,31 @@ function abrirCotizador(p){
           <div class="cot-total"><span>Total para tu cliente</span><strong data-r="total"></strong><em data-r="anticipo"></em></div>
         </div>
 
+        <div class="cot-bloque">
+          <div class="cot-titulo">6 · Lo que ve tu cliente (PDF)</div>
+          ${T.alumno.negocio && (T.alumno.negocio.logo || T.alumno.negocio.nombre)
+            ? `<div class="cot-marca">${T.alumno.negocio.logo ? `<img src="${T.alumno.negocio.logo}" alt="">` : ''}<span>Tu PDF sale con la marca de <strong>${esc(T.alumno.negocio.nombre || 'tu negocio')}</strong></span><button type="button" class="link" data-negocio>Editar</button></div>`
+            : `<div class="cot-marca falta"><span>🏷️ Agrega tu logo y tus datos para que el PDF salga con tu marca.</span><button type="button" class="btn ghost" data-negocio style="padding:7px 12px;font-size:0.8rem;">Agregar mi logo</button></div>`}
+          <div class="campo"><label>Lo que incluye ${C.paquetes.length > 1 ? '<em style="font-style:normal;color:var(--gris);">(<span data-nombre-paq="' + actual + '">' + (esc(P.nombre) || 'Paquete ' + (actual + 1)) + '</span>)</em>' : ''} · un punto por renglón</label>
+            <textarea data-k="incluye" rows="4" class="cot-textarea" placeholder="Ej. Cobertura de 8 horas&#10;Video de 5 minutos&#10;40 fotos editadas">${esc(P.incluye != null ? P.incluye : incluyeSugerido(P))}</textarea>
+            <button type="button" class="link" data-rellenar>↻ Llenar con lo de arriba</button></div>
+          <div class="fila2">
+            <div class="campo"><label>Fecha del evento</label><input type="date" data-gp="fecha_evento" value="${esc(C.pdf.fecha_evento)}"></div>
+            <div class="campo"><label>Válida por (días)</label><input type="number" inputmode="numeric" data-gp="vigencia" value="${esc(C.pdf.vigencia)}"></div>
+          </div>
+          <div class="campo"><label>Condiciones</label><textarea data-gp="notas" rows="3" class="cot-textarea">${esc(C.pdf.notas)}</textarea></div>
+        </div>
+
         ${C.paquetes.length > 1 ? `
           <div class="cot-bloque">
             <div class="cot-titulo">¿Cuál paquete cuenta en tu tablero?</div>
-            <div class="chips">${C.paquetes.map((x, i) => `<button type="button" class="chip ${C.elegido === i ? 'on' : ''}" data-elegido="${i}">${esc(x.nombre) || 'Paquete ' + (i + 1)} · <span data-r-total="${i}"></span></button>`).join('')}</div>
+            <div class="chips">${C.paquetes.map((x, i) => `<button type="button" class="chip ${C.elegido === i ? 'on' : ''}" data-elegido="${i}"><span data-nombre-paq="${i}">${esc(x.nombre) || 'Paquete ' + (i + 1)}</span> · <span data-r-total="${i}"></span></button>`).join('')}</div>
             <div class="ayuda" style="margin-top:6px;">Cuando tu cliente elija, márcalo aquí: ese será el monto del proyecto.</div>
           </div>` : ''}
 
         <div class="modal-pie"><div class="der">
           <button class="btn ghost" data-cerrar>Cancelar</button>
+          <button class="btn ghost" data-pdf>📄 Descargar PDF</button>
           <button class="btn" data-guardar-cot>Guardar cotización</button>
         </div></div>
       </div>`;
@@ -946,7 +1001,7 @@ function abrirCotizador(p){
     if(!r.costo) { g.className = 'cot-ganancia'; g.textContent = 'Llena los costos de arriba y aquí verás cuánto ganas.'; }
     else if(r.precio < r.costo){ g.className = 'cot-ganancia mal'; g.textContent = `⚠️ Con este precio pierdes ${dinero(r.costo - r.precio)}.`; }
     else if(r.precio < r.minimo){ g.className = 'cot-ganancia ojo'; g.textContent = `Ganas ${dinero(r.ganancia)} además de tu pago, pero no te queda colchón para imprevistos.`; }
-    else { g.className = 'cot-ganancia bien'; g.textContent = `✓ Ganas ${dinero(r.ganancia)} además de tu pago (${Math.round(r.ganancia / r.precio * 100)}% del precio).`; }
+    else { g.className = 'cot-ganancia bien'; g.innerHTML = `✓ Ganas ${dinero(r.ganancia)} además de tu pago (${Math.round(r.ganancia / r.precio * 100)}% del precio).<span class="cot-tip">Esto guárdalo para que tu negocio crezca. 🌱</span>`; }
     const pr = bg.querySelector('[data-r-placeholder]');
     if(pr) pr.placeholder = r.sugerido ? String(r.sugerido) : 'Precio';
     bg.querySelectorAll('[data-r-total]').forEach(el => { el.textContent = dinero(calcularPaquete(C.paquetes[+el.dataset.rTotal], C.impuesto).total); });
@@ -959,10 +1014,14 @@ function abrirCotizador(p){
       let obj = pq();
       while(partes.length > 1) obj = obj[partes.shift()];
       obj[partes[0]] = t.value;
-      if(t.dataset.k === 'nombre'){ const tab = bg.querySelector(`[data-tab="${actual}"]`); if(tab) tab.textContent = t.value || 'Paquete ' + (actual + 1); }
+      if(t.dataset.k === 'nombre'){
+        const tab = bg.querySelector(`[data-tab="${actual}"]`); if(tab) tab.textContent = t.value || 'Paquete ' + (actual + 1);
+        bg.querySelectorAll(`[data-nombre-paq="${actual}"]`).forEach(el => { el.textContent = t.value || 'Paquete ' + (actual + 1); });
+      }
       pintar();
     }
     if(t.dataset.g === 'pct'){ C.impuesto.pct = t.value; pintar(); }
+    if(t.dataset.gp){ C.pdf[t.dataset.gp] = t.value; }
   });
   bg.addEventListener('change', e => {
     const t = e.target;
@@ -1006,6 +1065,14 @@ function abrirCotizador(p){
     }
     if(d.quitar){ const [campo, i] = d.quitar.split('.'); pq()[campo].splice(+i, 1); render(); }
     if(d.elegido){ C.elegido = +d.elegido; render(); }
+    if(d.negocio !== undefined){ abrirMiNegocio(render); }
+    if(d.rellenar !== undefined){ pq().incluye = incluyeSugerido(pq()); render(); }
+    if(d.pdf !== undefined){
+      const elegido = calcularPaquete(C.paquetes[C.elegido], C.impuesto);
+      guardar({ id:p.id, cotizacion:C, monto_total:elegido.total, tipo: C.tipo || p.tipo });
+      t.disabled = true; t.textContent = 'Preparando…';
+      descargarPDF(p, C).finally(() => { t.disabled = false; t.textContent = '📄 Descargar PDF'; });
+    }
     if(d.guardarCot !== undefined){
       const elegido = calcularPaquete(C.paquetes[C.elegido], C.impuesto);
       cerrar();
@@ -1013,6 +1080,250 @@ function abrirCotizador(p){
     }
   });
   render();
+}
+
+// ============================================================
+// ============ MI NEGOCIO (logo y datos para el PDF) ===========
+// ============================================================
+const COLORES_MARCA = ['#0a0908','#c72a09','#d9a916','#1a8f4c','#2f6fbf','#7a4fb5','#d6457a','#0f8b8d'];
+
+// Reduce el logo para que pese poco (se guarda junto con su tablero)
+function procesarLogo(file){
+  return new Promise((ok, mal) => {
+    const lector = new FileReader();
+    lector.onerror = mal;
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = mal;
+      img.onload = () => {
+        const max = 500, esc_ = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * esc_); c.height = Math.round(img.height * esc_);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        const esPng = /png|svg|webp|gif/.test(file.type);
+        ok(esPng ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(file);
+  });
+}
+
+function abrirMiNegocio(alGuardar){
+  const N = { nombre:'', color:'#0a0908', whatsapp:'', correo:'', redes:'', logo:'', ...(T.alumno.negocio || {}) };
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h3>🏷️ Mi negocio</h3>
+      <p class="ayuda" style="margin:-8px 0 16px;font-size:0.85rem;">Con esto tus cotizaciones en PDF salen con tu logo y tus datos.</p>
+      <div class="campo"><label>Logo</label>
+        <div class="neg-logo">
+          <div class="neg-logo-prev" id="n-prev">${N.logo ? `<img src="${N.logo}" alt="Logo">` : '<span>Sin logo</span>'}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label class="btn ghost" style="padding:8px 12px;font-size:0.82rem;text-align:center;">Subir logo<input type="file" id="n-logo" accept="image/*" hidden></label>
+            <button type="button" class="btn ghost" id="n-quitar" style="padding:8px 12px;font-size:0.82rem;${N.logo ? '' : 'display:none;'}">Quitar</button>
+          </div>
+        </div>
+      </div>
+      <div class="campo"><label>Nombre de tu negocio</label><input id="n-nombre" value="${esc(N.nombre)}" placeholder="Ej. Estudio Luz"></div>
+      <div class="campo"><label>Color de tu marca</label>
+        <div class="chips" id="n-colores">${COLORES_MARCA.map(c => `<button type="button" class="color-chip ${N.color === c ? 'on' : ''}" data-color="${c}" style="background:${c}"></button>`).join('')}
+          <input type="color" id="n-color" value="${N.color}" title="Otro color"></div>
+      </div>
+      <div class="fila2">
+        <div class="campo"><label>WhatsApp</label><input id="n-whatsapp" value="${esc(N.whatsapp)}" inputmode="tel" placeholder="Ej. 55 1234 5678"></div>
+        <div class="campo"><label>Correo</label><input id="n-correo" value="${esc(N.correo)}" inputmode="email" placeholder="hola@tunegocio.com"></div>
+      </div>
+      <div class="campo"><label>Instagram o página web</label><input id="n-redes" value="${esc(N.redes)}" placeholder="Ej. @estudioluz"></div>
+      <div class="modal-pie"><div class="der"><button class="btn ghost" data-cerrar>Cancelar</button><button class="btn" id="n-guardar">Guardar</button></div></div>
+    </div>`;
+  document.body.appendChild(bg);
+  const $ = id => bg.querySelector('#' + id);
+  const cerrar = () => bg.remove();
+  bg.addEventListener('click', e => { if(e.target === bg || e.target.closest('[data-cerrar]')) cerrar(); });
+  const pintarColor = c => { N.color = c; $('n-color').value = c; bg.querySelectorAll('[data-color]').forEach(x => x.classList.toggle('on', x.dataset.color === c)); };
+  bg.querySelectorAll('[data-color]').forEach(b => b.addEventListener('click', () => pintarColor(b.dataset.color)));
+  $('n-color').addEventListener('input', e => pintarColor(e.target.value));
+  $('n-logo').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    if(!f) return;
+    try {
+      N.logo = await procesarLogo(f);
+      $('n-prev').innerHTML = `<img src="${N.logo}" alt="Logo">`;
+      $('n-quitar').style.display = '';
+    } catch(err){ toast('No se pudo leer esa imagen. Prueba con un PNG o JPG.'); }
+  });
+  $('n-quitar').addEventListener('click', () => { N.logo = ''; $('n-prev').innerHTML = '<span>Sin logo</span>'; $('n-quitar').style.display = 'none'; });
+  $('n-guardar').addEventListener('click', async () => {
+    ['nombre','whatsapp','correo','redes'].forEach(k => { N[k] = $('n-' + k).value.trim(); });
+    const btn = $('n-guardar'); btn.disabled = true; btn.textContent = 'Guardando…';
+    const { data, error } = await sb.rpc('taller_guardar_negocio', { p_token: T.token, p_pin: T.pin, p_negocio: N });
+    if(pinRechazado(data)){ cerrar(); return; }
+    if(error){ btn.disabled = false; btn.textContent = 'Guardar'; toast('No se pudo guardar. Si el logo es muy pesado, prueba con uno más ligero.'); return; }
+    T.alumno.negocio = N;
+    cerrar();
+    toast('Listo, tus cotizaciones ya llevan tu marca');
+    if(alGuardar) alGuardar();
+  });
+}
+
+// ============================================================
+// ============ PDF DE LA COTIZACIÓN ============================
+// ============================================================
+let _jspdf = null;
+function cargarJsPDF(){
+  if(_jspdf) return _jspdf;
+  _jspdf = new Promise((ok, mal) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = () => ok(window.jspdf.jsPDF);
+    s.onerror = () => { _jspdf = null; mal(new Error('jsPDF')); };
+    document.head.appendChild(s);
+  });
+  return _jspdf;
+}
+
+// En el PDF usamos el código de moneda (las fuentes del PDF no traen todos los símbolos)
+function pdfDinero(n){
+  const conPeso = ['MXN','USD','COP','ARS','CLP','UYU'].includes(MONEDA);
+  return (conPeso ? '$' : '') + Math.round(Number(n) || 0).toLocaleString('es-MX') + ' ' + MONEDA;
+}
+function hexRgb(h){ const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); const v = parseInt(m ? m[1] : '0a0908', 16); return [v >> 16, (v >> 8) & 255, v & 255]; }
+const aclarar = (rgb, f) => rgb.map(c => Math.round(c + (255 - c) * f));
+
+// Lo que incluye, armado a partir de lo que se capturó en el cotizador
+function incluyeSugerido(pq){
+  const lineas = [];
+  if(!pq.solo){
+    const equipo = pq.equipo.filter(r => r.puesto && num(r.cant) > 0).map(r => num(r.cant) > 1 ? `${r.puesto} (${num(r.cant)})` : r.puesto);
+    if(equipo.length) lineas.push('Equipo de producción: ' + equipo.join(', '));
+  }
+  pq.edicion.filter(r => r.concepto).forEach(r => lineas.push(r.concepto));
+  return lineas.join('\n');
+}
+
+async function descargarPDF(p, C){
+  let jsPDF;
+  try { jsPDF = await cargarJsPDF(); }
+  catch(e){ toast('No se pudo preparar el PDF. Revisa tu conexión.'); return; }
+  const N = T.alumno.negocio || {};
+  const marca = hexRgb(N.color);
+  const doc = new jsPDF({ unit:'pt', format:'letter' });
+  const W = 612, H = 792, M = 48;
+  let y = 0;
+  const gris = [110, 106, 98], texto = [33, 31, 28];
+  const nuevaPagina = alto => { if(y + alto > H - 90){ doc.addPage(); doc.setFillColor(...marca); doc.rect(0, 0, W, 6, 'F'); y = M; } };
+
+  // Encabezado
+  doc.setFillColor(...marca); doc.rect(0, 0, W, 8, 'F');
+  y = M;
+  let altoMarca = 0;
+  if(N.logo){
+    try {
+      const props = doc.getImageProperties(N.logo);
+      const r = Math.min(170 / props.width, 64 / props.height);
+      doc.addImage(N.logo, N.logo.includes('image/png') ? 'PNG' : 'JPEG', M, y, props.width * r, props.height * r);
+      altoMarca = props.height * r;
+    } catch(e){}
+  }
+  if(!altoMarca && N.nombre){
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(...marca);
+    doc.text(N.nombre, M, y + 20); altoMarca = 26;
+  }
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.setTextColor(...texto);
+  doc.text('COTIZACIÓN', W - M, y + 16, { align:'right' });
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(...gris);
+  doc.text('Folio ' + C.pdf.folio, W - M, y + 32, { align:'right' });
+  doc.text(new Date().toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' }), W - M, y + 45, { align:'right' });
+  y += Math.max(altoMarca, 50) + 22;
+  doc.setDrawColor(228, 223, 214); doc.line(M, y, W - M, y);
+  y += 26;
+
+  // Datos del proyecto
+  const dato = (etq, val) => {
+    if(!val) return;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...gris);
+    doc.text(etq.toUpperCase(), M, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(...texto);
+    doc.text(String(val), M + 120, y);
+    y += 20;
+  };
+  dato('Para', p.cliente);
+  dato('Proyecto', p.nombre);
+  dato('Servicio', C.tipo);
+  if(C.pdf.fecha_evento) dato('Fecha', new Date(C.pdf.fecha_evento + 'T12:00:00').toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' }));
+  y += 12;
+
+  // Paquetes
+  C.paquetes.forEach((pq, i) => {
+    const r = calcularPaquete(pq, C.impuesto);
+    const items = (pq.incluye != null ? pq.incluye : incluyeSugerido(pq)).split('\n').map(s => s.trim()).filter(Boolean);
+    doc.setFontSize(10.5);
+    const lineas = items.flatMap(it => doc.splitTextToSize(it, W - 2 * M - 46));
+    const alto = 64 + lineas.length * 15 + (items.length ? 12 : 0) + 22;
+    nuevaPagina(alto);
+    doc.setFillColor(...aclarar(marca, 0.92)); doc.setDrawColor(...aclarar(marca, 0.7));
+    doc.roundedRect(M, y, W - 2 * M, alto, 8, 8, 'FD');
+    doc.setFillColor(...marca); doc.roundedRect(M, y, 5, alto, 2, 2, 'F');
+    let yy = y + 28;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(...texto);
+    doc.text(pq.nombre || (C.paquetes.length > 1 ? 'Opción ' + (i + 1) : 'Propuesta'), M + 20, yy);
+    doc.setFontSize(17); doc.setTextColor(...marca);
+    doc.text(pdfDinero(r.total), W - M - 18, yy, { align:'right' });
+    yy += 16;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...gris);
+    doc.text(C.impuesto.activo ? `${pdfDinero(r.precio)} + IVA (${num(C.impuesto.pct)}%)` : 'Precio total', W - M - 18, yy, { align:'right' });
+    if(items.length){
+      yy += 10;
+      doc.setFontSize(10.5); doc.setTextColor(...texto);
+      items.forEach(it => {
+        const ls = doc.splitTextToSize(it, W - 2 * M - 46);
+        doc.setTextColor(...marca); doc.text('•', M + 20, yy + 8);
+        doc.setTextColor(...texto); doc.text(ls, M + 32, yy + 8);
+        yy += ls.length * 15;
+      });
+    }
+    doc.setFontSize(9.5); doc.setTextColor(...gris);
+    doc.text(`Anticipo para apartar (50%): ${pdfDinero(r.anticipo)}`, M + 20, y + alto - 16);
+    y += alto + 14;
+  });
+
+  // Condiciones
+  const vence = new Date(); vence.setDate(vence.getDate() + (num(C.pdf.vigencia) || 15));
+  const condiciones = [C.pdf.notas, `Esta cotización es válida por ${num(C.pdf.vigencia) || 15} días (hasta el ${vence.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' })}).`].filter(Boolean).join('\n');
+  doc.setFontSize(10);
+  const lc = doc.splitTextToSize(condiciones, W - 2 * M);
+  nuevaPagina(30 + lc.length * 14);
+  y += 6;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...texto);
+  doc.text('Condiciones', M, y); y += 16;
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(...gris);
+  doc.text(lc, M, y);
+
+  // Pie con datos de contacto en todas las páginas
+  const contacto = [N.nombre, N.whatsapp && 'WhatsApp ' + N.whatsapp, N.correo, N.redes].filter(Boolean).join('   ·   ');
+  for(let i = 1; i <= doc.getNumberOfPages(); i++){
+    doc.setPage(i);
+    doc.setFillColor(...marca); doc.rect(0, H - 8, W, 8, 'F');
+    if(contacto){ doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...gris); doc.text(contacto, W / 2, H - 26, { align:'center' }); }
+  }
+
+  // Sin acentos en el nombre del archivo: algunos navegadores lo descartan y lo llaman "download"
+  const nombreArchivo = ('Cotizacion ' + (p.cliente || p.nombre || '')).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w -]/g, '').trim().replace(/\s+/g, '-') + '.pdf';
+  const blob = doc.output('blob');
+  const archivo = new File([blob], nombreArchivo, { type:'application/pdf' });
+  // En celular, abre "Compartir" para mandarlo directo por WhatsApp; si no se puede, se descarga
+  if(window.matchMedia('(pointer:coarse)').matches && navigator.canShare && navigator.canShare({ files:[archivo] })){
+    try { await navigator.share({ files:[archivo], title:nombreArchivo }); return; }
+    catch(e){ if(e.name === 'AbortError') return; }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombreArchivo;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 function abrirEditor(p){
