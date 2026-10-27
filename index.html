@@ -287,7 +287,7 @@ const TEXTO_AVISO = `
   <h4>¿Dónde se guarda tu información?</h4>
   <p>En la base de datos de Level Producer, que se resguarda de forma privada. La única persona con acceso a esta base de datos es Sofía Loarca, quien te acompaña en el taller.</p>
   <h4>¿Cómo cuidamos tu información?</h4>
-  <p>Tu información es tuya. No la compartimos, no la vendemos y no la usamos para contactar a tus clientes. Solo nos sirve para mantener tu tablero funcionando, guardar tus avances y ayudarte si algo no funciona como debería.</p>
+  <p>Tu información es tuya. Solo nos sirve para mantener tu tablero funcionando, guardar tus avances y ayudarte si algo no funciona como debería.</p>
   <h4>Tú decides</h4>
   <p>Si en algún momento quieres que borremos tu tablero y toda tu información, solo pídelo y lo hacemos.</p>`;
 
@@ -297,7 +297,7 @@ function mostrarAvisoPrivacidad(){
       <div class="hero-marca">Organiza tus proyectos</div>
       <h1>Aviso de privacidad</h1>
       ${TEXTO_AVISO}
-      <p class="aviso-acepta">Al dar clic en <strong>Acepto</strong>, autorizas que la información de tu tablero se guarde en la base de datos de Level Producer, en los términos de este aviso.</p>
+      <p class="aviso-acepta">Al dar clic en <strong>Acepto</strong>, autorizas que la información de tu tablero se guarde en la base de datos de Level Producer. No hacemos ningún uso de tu información: se guarda únicamente para que esta página funcione.</p>
       <button class="btn" id="b-acepto" style="width:100%;">Acepto, ir a mi tablero</button>
     </div>`;
   document.getElementById('b-acepto').addEventListener('click', async e => {
