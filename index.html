@@ -217,6 +217,7 @@
   .ig-pregunta p{flex:1;min-width:240px;margin:0;font-size:0.92rem;line-height:1.5;}
   .ig-pregunta-acc{display:flex;gap:8px;}
   .ig-pregunta .btn{background:var(--mensual);}
+  .ig-pregunta-top{margin:0 0 18px;}
   .ig-pregunta .btn.ghost{background:transparent;color:var(--texto);}
   .ig-barra{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
   .ig-barra .btn{background:var(--mensual);}
@@ -651,6 +652,8 @@ function renderTablero(destacarId){
       </div>
     </div>
 
+    ${renderPreguntaIgualas()}
+
     <div class="si-banner">
       <span class="si-banner-anillos" aria-hidden="true"></span>
       <p><strong>Recuerda:</strong> para avanzar profesionalmente, primero tienes que estar bien contigo.</p>
@@ -700,7 +703,7 @@ function renderTablero(destacarId){
         <li><strong>Te pagan el anticipo:</strong> clic en <em>Me pagó el anticipo</em> y escribe cuánto te dieron. Baja a Producción.</li>
         <li><strong>Avanzas:</strong> Preproducción → Producción → Edición. En edición, mueve la barra según el paso en el que vas. El avance se calcula solo.</li>
         <li><strong>Entregas:</strong> clic en <em>Entregado</em>. Baja a Cobranza y ves cuánto te deben.</li>
-        <li><strong>Clientes mensuales:</strong> si tienes igualas, actívalas en la sección 4. Cada mes marcas lo que entregas y quién ya te pagó; lo pendiente aparece en Cobranza.</li>
+        <li><strong>Clientes mensuales:</strong> si tienes igualas, contesta <em>Sí, tengo</em> arriba del tablero, o al crear un proyecto elige <em>¿Es iguala mensual? Sí</em>. Cada mes marcas lo que entregas y quién ya te pagó; lo pendiente aparece en Cobranza.</li>
         <li><strong>Te liquidan:</strong> clic en <em>Me liquidaron</em>. Listo, pasa a tus cobrados.</li>
       </ol>
       <p class="ayuda" style="margin-bottom:14px;">Tip: en computadora también puedes arrastrar las tarjetas de una columna a otra.</p>
@@ -741,6 +744,12 @@ function renderTablero(destacarId){
     registro[mes] = Object.assign(registro[mes] || { e: igualaMes(ig, mes).e }, { pagado:true, fecha:`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}` });
     guardarIguala({ id, registro }, { msg:'¡Cobrado! 🎉' });
   }));
+  const pregIg = document.getElementById('ig-pregunta');
+  if(pregIg) pregIg.addEventListener('click', e => {
+    const t = e.target.closest('[data-igualas]'); if(!t) return;
+    activarIgualas(t.dataset.igualas === 'si');
+    if(t.dataset.igualas === 'no') toast('Listo. Si algún día tienes, actívalo abajo del tablero.');
+  });
   const bActIg = document.getElementById('b-activar-igualas');
   if(bActIg) bActIg.addEventListener('click', e => { e.preventDefault(); activarIgualas(true); });
 
@@ -2471,19 +2480,20 @@ async function activarIgualas(si){
   if(error) toast('No se pudo guardar tu preferencia.');
 }
 
+// La pregunta va arriba del tablero, justo después del saludo
+function renderPreguntaIgualas(){
+  if(igualasActivas() || (T.alumno.negocio || {}).igualas === false) return '';
+  return `
+    <div class="ig-pregunta ig-pregunta-top" id="ig-pregunta">
+      <span class="ig-pregunta-ico">🔁</span>
+      <p><strong>¿Tienes clientes mensuales (igualas)?</strong> Un cliente que te paga cada mes por un servicio fijo. Si los tienes, aquí llevas lo que les entregas y quién ya te pagó.</p>
+      <div class="ig-pregunta-acc"><button class="btn" data-igualas="si">Sí, tengo</button><button class="btn ghost" data-igualas="no">Por ahora no</button></div>
+    </div>`;
+}
+
 function renderMensuales(){
   const negocio = T.alumno.negocio || {};
-  if(!igualasActivas()){
-    if(negocio.igualas === false) return '';
-    return `
-      <section class="seccion" id="sec-mensuales" style="--c:var(--mensual)">
-        <div class="ig-pregunta">
-          <span class="ig-pregunta-ico">🔁</span>
-          <p><strong>¿Tienes clientes mensuales (igualas)?</strong> Un cliente que te paga cada mes por un servicio fijo. Si los tienes, aquí llevas lo que les entregas y quién ya te pagó.</p>
-          <div class="ig-pregunta-acc"><button class="btn" data-igualas="si">Sí, tengo</button><button class="btn ghost" data-igualas="no">Por ahora no</button></div>
-        </div>
-      </section>`;
-  }
+  if(!igualasActivas()) return '';
   const mes = T.mesIguala || mesHoy();
   const delMes = T.igualas.filter(ig => igualaEnMes(ig, mes));
   const fijo = delMes.reduce((a, ig) => a + (+ig.monto || 0), 0);
@@ -2562,7 +2572,6 @@ function conectarMensuales(){
     const t = e.target.closest('button, [data-editar-iguala]');
     if(!t) return;
     const d = t.dataset, mes = T.mesIguala || mesHoy();
-    if(d.igualas){ activarIgualas(d.igualas === 'si'); if(d.igualas === 'no') toast('Listo. Si algún día tienes, actívalo abajo del tablero.'); }
     if(d.mes){ T.mesIguala = d.mes === 'hoy' ? mesHoy() : mesSumar(mes, +d.mes); renderTablero('sec-mensuales'); }
     if(d.nuevaIguala !== undefined) abrirEditorIguala(null);
     if(d.editarIguala) abrirEditorIguala(T.igualas.find(x => x.id === d.editarIguala));
@@ -2620,7 +2629,7 @@ function abrirEditorIguala(ig, desde){
     bg.innerHTML = `
       <div class="modal">
         <h3>${nueva ? '🔁 Nueva iguala' : 'Editar iguala'}</h3>
-        ${desde ? '<p class="ayuda" style="margin:-8px 0 14px;font-size:0.85rem;">Llenamos los datos con tu prospecto. Revísalos y guarda.</p>' : ''}
+        ${desde && desde.id ? '<p class="ayuda" style="margin:-8px 0 14px;font-size:0.85rem;">Llenamos los datos con tu prospecto. Revísalos y guarda.</p>' : ''}
         <div class="campo"><label>Cliente</label><input id="i-cliente" value="${esc(d.cliente)}" placeholder="Ej. Cafetería Aroma"></div>
         <div class="campo"><label>Servicio</label><input id="i-servicio" value="${esc(d.servicio)}" placeholder="Ej. Contenido para redes"></div>
         <div class="fila2">
@@ -2677,7 +2686,7 @@ function abrirEditorIguala(ig, desde){
       if(nueva){
         if(!(T.alumno.negocio || {}).igualas) await activarIgualas(true);
         const r = await guardarIguala(datos, { destacar:true, msg:'Iguala creada 🔁' });
-        if(r && desde){
+        if(r && desde && desde.id){
           const { data } = await sb.rpc('taller_borrar_proyecto', { p_token: T.token, p_pin: T.pin, p_id: desde.id });
           if(!pinRechazado(data)){ T.proyectos = T.proyectos.filter(x => x.id !== desde.id); renderTablero('ig-' + r.id); }
         }
@@ -2720,6 +2729,8 @@ function abrirEditor(p){
   bg.innerHTML = `
     <div class="modal">
       <h3>${nuevo ? 'Nuevo proyecto' : 'Editar proyecto'}</h3>
+      ${nuevo ? `<div class="campo"><label>¿Es iguala mensual?</label>
+        <div class="chips"><button type="button" class="chip" id="e-es-iguala">🔁 Sí, me paga cada mes</button><button type="button" class="chip on">No, es un proyecto único</button></div></div>` : ''}
       <div class="campo"><label>Proyecto</label><input id="e-nombre" value="${esc(d.nombre)}" placeholder="Ej. Video de lanzamiento"></div>
       <div class="campo"><label>Cliente</label><input id="e-cliente" value="${esc(d.cliente)}" placeholder="Ej. Cafetería Aroma"></div>
       <div class="campo"><label>Tipo de contenido</label>
@@ -2764,6 +2775,11 @@ function abrirEditor(p){
   bg.querySelectorAll('[data-ae]').forEach(c => c.addEventListener('click', () => { $('e-edicion').value = c.dataset.ae; syncEdicion(); }));
   syncEdicion();
   if(nuevo) setTimeout(() => $('e-nombre').focus(), 50);
+  if(nuevo) $('e-es-iguala').addEventListener('click', () => {
+    const pre = { cliente: $('e-cliente').value.trim(), nombre: $('e-nombre').value.trim(), tipo, monto_total: +$('e-monto').value || '' };
+    cerrar();
+    abrirEditorIguala(null, pre);
+  });
 
   $('e-guardar').addEventListener('click', async () => {
     const nombre = $('e-nombre').value.trim();
