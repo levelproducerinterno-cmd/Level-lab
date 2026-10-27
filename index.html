@@ -240,6 +240,8 @@
   .ig-cont{display:flex;align-items:center;gap:6px;}
   .ig-cont button{width:28px;height:28px;border-radius:50%;border:1px solid var(--linea);background:#fff;font-weight:700;}
   .ig-cont button:disabled{opacity:.35;}
+  .ig-estado{margin-left:auto;border:1px solid var(--linea);background:#fff;border-radius:20px;padding:3px 10px;font-size:0.74rem;font-weight:700;color:var(--gris);}
+  .ig-estado.on{background:#e6f3f3;border-color:#bfe0e0;color:#0b6a6b;}
   .ig-aviso{margin-top:10px;font-size:0.8rem;background:#fff8e0;border-radius:8px;padding:8px 10px;line-height:1.4;}
   .ig-aviso .link{margin-left:6px;}
   .ig-cobrar{margin-top:14px;background:#fff;border:1px solid #bfe0e0;border-radius:12px;}
@@ -2411,12 +2413,11 @@ function mesDiferencia(desde, hasta){ const [a1, m1] = desde.split('-').map(Numb
 const mesNombre = clave => { const [a, m] = clave.split('-').map(Number); return `${MES_NOMBRES[m - 1]} ${a}`; };
 const igualasActivas = () => (T.negocioIgualas = (T.alumno.negocio || {}).igualas === true || T.igualas.length > 0);
 
-// ¿Esta iguala corre en ese mes?
+// ¿Esta iguala corre en ese mes? (las inactivas corren hasta el mes en que se desactivaron)
 function igualaEnMes(ig, mes){
   if(mes < ig.inicio) return false;
   if(ig.meses && mesDiferencia(ig.inicio, mes) >= ig.meses) return false;
-  if(!ig.activa) return !!(ig.registro || {})[mes];
-  return true;
+  return !((ig.registro || {})[mes] || {}).pausa;
 }
 function igualaMes(ig, mes){
   const r = (ig.registro || {})[mes] || {};
@@ -2511,8 +2512,9 @@ function renderMensuales(){
       <div class="ig-grid">
         ${delMes.length ? delMes.map(ig => renderIguala(ig, mes)).join('') : `<div class="col-vacia" style="grid-column:1/-1;">${T.igualas.length ? 'Ninguna iguala corre en este mes.' : 'Da de alta tu primer cliente mensual con <strong>+ Nueva iguala</strong>.'}</div>`}
       </div>
-      ${pausadas.length ? `<details class="cobrados"><summary>⏸ Igualas terminadas o en pausa · ${pausadas.length}</summary>
-        ${pausadas.map(ig => `<div class="cobrado-fila" data-editar-iguala="${ig.id}"><span><strong>${esc(ig.cliente)}</strong> · ${esc(ig.servicio)}</span><span>${dinero(ig.monto)}/mes</span></div>`).join('')}</details>` : ''}
+      ${pausadas.length ? `<details class="cobrados"><summary>○ Igualas inactivas · ${pausadas.length}</summary>
+        ${pausadas.map(ig => `<div class="cobrado-fila"><span data-editar-iguala="${ig.id}"><strong>${esc(ig.cliente)}</strong> · ${esc(ig.servicio)} · ${dinero(ig.monto)}/mes</span>
+          <button class="ig-estado" data-activa="${ig.id}">Reactivar</button></div>`).join('')}</details>` : ''}
     </section>`;
 }
 
@@ -2521,8 +2523,7 @@ function renderIguala(ig, mes){
   const total = (ig.entregables || []).reduce((a, x) => a + (+x.cantidad || 0), 0);
   const hechos = m.e.reduce((a, b) => a + b, 0);
   const pct = total ? Math.round(hechos / total * 100) : 0;
-  const nMes = mesDiferencia(ig.inicio, mes) + 1;
-  const ultimo = ig.meses && nMes === ig.meses;
+  let nMes = 0; for(let m = ig.inicio; m <= mes; m = mesSumar(m, 1)) if(igualaEnMes(ig, m)) nMes++;
   const revisar = mes === mesHoy() && mesDiferencia(ig.precio_desde || ig.inicio, mes) >= 6;
   const chip = { pagado:'<span class="ig-chip ok">✓ Pagado</span>', pendiente:`<span class="ig-chip">Cobro el día ${ig.dia_cobro}</span>`, atrasado:`<span class="ig-chip mal">Atrasado · día ${ig.dia_cobro}</span>` }[estado];
   return `
@@ -2531,7 +2532,8 @@ function renderIguala(ig, mes){
         <div><div class="card-nombre">${esc(ig.cliente) || 'Sin nombre'}</div><div class="card-cliente">${esc(ig.servicio)}</div></div>
         <div class="ig-monto">${dinero(ig.monto)}<span>/mes</span></div>
       </div>
-      <div class="card-meta">${chip}<span class="fecha">Mes ${nMes}${ig.meses ? ' de ' + ig.meses : ''}</span></div>
+      <div class="card-meta">${chip}<span class="fecha">Mes ${nMes}</span>
+        <button class="ig-estado ${ig.activa ? 'on' : ''}" data-activa="${ig.id}" title="${ig.activa ? 'Marcar como inactiva' : 'Reactivar'}">${ig.activa ? '● Activa' : '○ Inactiva'}</button></div>
       ${total ? `
         <div class="barra" style="--c:var(--mensual)"><div style="width:${pct}%"></div></div>
         <div class="barra-label"><span>Entregado este mes</span><strong>${hechos} de ${total}</strong></div>
@@ -2544,7 +2546,6 @@ function renderIguala(ig, mes){
               <button data-ent="${ig.id}|${i}|1" ${m.e[i] >= +x.cantidad ? 'disabled' : ''}>+</button>
             </div>
           </div>`).join('')}</div>` : ''}
-      ${ultimo ? `<div class="ig-aviso">📅 Último mes del contrato. ¿Renuevas?<button class="link" data-renovar="${ig.id}">Renovar</button></div>` : ''}
       ${revisar ? `<div class="ig-aviso">💡 Llevas ${mesDiferencia(ig.precio_desde || ig.inicio, mes)} meses con el mismo precio. Revisa si es momento de ajustarlo.<button class="link" data-revisado="${ig.id}">Ya lo revisé</button></div>` : ''}
       <div class="card-acciones">
         ${m.pagado
@@ -2579,21 +2580,30 @@ function conectarMensuales(){
       registro[mes] = Object.assign(registro[mes] || { e: m.e }, m.pagado ? { pagado:false, fecha:'' } : { pagado:true, fecha:`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}` });
       guardarIguala({ id: ig.id, registro }, { msg: m.pagado ? 'Pago desmarcado' : '¡Cobrado! 🎉' });
     }
-    if(d.renovar){
-      const ig = T.igualas.find(x => x.id === d.renovar);
-      const n = prompt('¿Por cuántos meses más renuevas? (deja vacío si ya no tiene fecha de fin)', '6');
-      if(n === null) return;
-      guardarIguala({ id: ig.id, meses: n.trim() ? String(ig.meses + (parseInt(n, 10) || 0)) : '' }, { msg: '¡Iguala renovada!' });
-    }
+    if(d.activa) cambiarActiva(T.igualas.find(x => x.id === d.activa));
     if(d.revisado) guardarIguala({ id: d.revisado, precio_desde: mesHoy() });
   });
+}
+
+// Inactiva: corre hasta este mes (sus pagos pendientes siguen en Cobranza) y deja de aparecer en los siguientes.
+// Al reactivarla vuelve a correr desde este mes.
+function cambiarActiva(ig){
+  if(ig.activa){
+    if(!confirm(`¿Marcar la iguala de ${ig.cliente} como inactiva? Deja de aparecer a partir del próximo mes; su historial se guarda.`)) return;
+    guardarIguala({ id: ig.id, activa: false, meses: String(mesDiferencia(ig.inicio, mesHoy()) + 1) }, { msg: 'Iguala inactiva' });
+  } else {
+    // Los meses que estuvo inactiva quedan marcados como pausa, así no cuentan como deuda y el historial se conserva
+    const registro = JSON.parse(JSON.stringify(ig.registro || {}));
+    if(ig.meses) for(let m = mesSumar(ig.inicio, ig.meses); m < mesHoy(); m = mesSumar(m, 1)) registro[m] = { pausa: true };
+    guardarIguala({ id: ig.id, activa: true, meses: '', registro, precio_desde: mesHoy() }, { msg: '¡Iguala activa de nuevo! 🔁', destacar: true });
+  }
 }
 
 function abrirEditorIguala(ig, desde){
   const nueva = !ig;
   const d = ig ? JSON.parse(JSON.stringify(ig)) : {
     cliente: desde ? desde.cliente : '', servicio: desde ? (desde.nombre || desde.tipo || '') : '',
-    monto: desde ? desde.monto_total : '', dia_cobro: 1, inicio: mesHoy(), meses: 6,
+    monto: desde ? desde.monto_total : '', dia_cobro: 1, inicio: mesHoy(), meses: null,
     entregables: [{ nombre:'Reels', cantidad:8 }], activa: true
   };
   const bg = document.createElement('div');
@@ -2617,17 +2627,11 @@ function abrirEditorIguala(ig, desde){
           <div class="campo"><label>Monto mensual</label><input id="i-monto" type="number" inputmode="decimal" value="${d.monto}" placeholder="0"></div>
           <div class="campo"><label>Día de cobro</label><input id="i-dia" type="number" inputmode="numeric" min="1" max="31" value="${d.dia_cobro}"></div>
         </div>
-        <div class="fila2">
-          <div class="campo"><label>Empieza en</label><input id="i-inicio" type="month" value="${d.inicio}"></div>
-          <div class="campo"><label>Duración</label><select id="i-meses">
-            ${[['', 'Sin fecha de fin'], [3, '3 meses'], [6, '6 meses'], [12, '12 meses']].map(([v, t]) => `<option value="${v}" ${String(d.meses || '') === String(v) ? 'selected' : ''}>${t}</option>`).join('')}
-            ${d.meses && ![3, 6, 12].includes(+d.meses) ? `<option value="${d.meses}" selected>${d.meses} meses</option>` : ''}
-          </select></div>
-        </div>
+        <div class="campo"><label>Empezó en</label><input id="i-inicio" type="month" value="${d.inicio}"></div>
         <div class="campo"><label>Qué le entregas cada mes</label>
           <div id="i-ents">${filas()}</div>
           <button type="button" class="col-agregar" data-agregar-ent>+ Agregar entregable</button></div>
-        ${nueva ? '<label class="cot-check"><input type="checkbox" id="i-previos" checked> Si empezó antes de este mes, ya me pagaron los meses anteriores</label>' : `<label class="cot-check"><input type="checkbox" id="i-activa" ${d.activa ? 'checked' : ''}> Iguala activa (desmárcala si terminó o está en pausa)</label>`}
+        ${nueva ? '<label class="cot-check"><input type="checkbox" id="i-previos" checked> Si empezó antes de este mes, ya me pagaron los meses anteriores</label>' : ''}
         <div class="modal-pie">
           ${nueva ? '' : '<button class="btn peligro" data-borrar>Borrar</button>'}
           <div class="der"><button class="btn ghost" data-cerrar>Cancelar</button><button class="btn" data-guardar>Guardar</button></div>
@@ -2639,8 +2643,7 @@ function abrirEditorIguala(ig, desde){
     const $ = id => bg.querySelector('#' + id);
     d.cliente = $('i-cliente').value.trim(); d.servicio = $('i-servicio').value.trim();
     d.monto = $('i-monto').value; d.dia_cobro = Math.min(31, Math.max(1, parseInt($('i-dia').value, 10) || 1));
-    d.inicio = $('i-inicio').value || mesHoy(); d.meses = $('i-meses').value;
-    if($('i-activa')) d.activa = $('i-activa').checked;
+    d.inicio = $('i-inicio').value || mesHoy();
   };
   bg.addEventListener('input', e => {
     const t = e.target;
@@ -2654,7 +2657,7 @@ function abrirEditorIguala(ig, desde){
     if(t.dataset.agregarEnt !== undefined){ leer(); d.entregables.push({ nombre:'', cantidad:1 }); render(); }
     if(t.dataset.quitarEnt !== undefined){ leer(); d.entregables.splice(+t.dataset.quitarEnt, 1); render(); }
     if(t.dataset.borrar !== undefined){
-      if(!confirm(`¿Borrar la iguala de ${ig.cliente}? Se pierde su historial de cobros. Si solo terminó, mejor desmarca "Iguala activa".`)) return;
+      if(!confirm(`¿Borrar la iguala de ${ig.cliente}? Se pierde su historial de cobros. Si solo terminó, mejor márcala como inactiva.`)) return;
       cerrar();
       const { data, error } = await sb.rpc('taller_borrar_iguala', { p_token: T.token, p_pin: T.pin, p_id: ig.id });
       if(pinRechazado(data)) return;
@@ -2665,7 +2668,7 @@ function abrirEditorIguala(ig, desde){
       leer();
       if(!d.cliente){ toast('Escribe el nombre del cliente'); return; }
       const datos = { cliente: d.cliente, servicio: d.servicio, monto: +d.monto || 0, dia_cobro: d.dia_cobro, inicio: d.inicio,
-        meses: d.meses ? String(d.meses) : '', entregables: d.entregables.filter(x => x.nombre.trim()).map(x => ({ nombre: x.nombre.trim(), cantidad: +x.cantidad || 0 })), activa: d.activa };
+        entregables: d.entregables.filter(x => x.nombre.trim()).map(x => ({ nombre: x.nombre.trim(), cantidad: +x.cantidad || 0 })) };
       if(nueva && bg.querySelector('#i-previos').checked && datos.inicio < mesHoy()){
         datos.registro = {};
         for(let m = datos.inicio; m < mesHoy(); m = mesSumar(m, 1)) datos.registro[m] = { pagado:true, fecha:'', e: datos.entregables.map(x => x.cantidad) };
