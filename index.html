@@ -959,6 +959,8 @@ function abrirCotizador(p){
           ${T.alumno.negocio && (T.alumno.negocio.logo || T.alumno.negocio.nombre)
             ? `<div class="cot-marca">${T.alumno.negocio.logo ? `<img src="${T.alumno.negocio.logo}" alt="">` : ''}<span>Tu PDF sale con la marca de <strong>${esc(T.alumno.negocio.nombre || 'tu negocio')}</strong></span><button type="button" class="link" data-negocio>Editar</button></div>`
             : `<div class="cot-marca falta"><span>🏷️ Agrega tu logo y tus datos para que el PDF salga con tu marca.</span><button type="button" class="btn ghost" data-negocio style="padding:7px 12px;font-size:0.8rem;">Agregar mi logo</button></div>`}
+          <div class="campo"><label>Mensaje para tu cliente · aparece al inicio del PDF</label>
+            <textarea data-gp="intro" rows="4" class="cot-textarea">${esc(C.pdf.intro != null ? C.pdf.intro : introSugerida(p, C))}</textarea></div>
           <div class="campo"><label>Lo que incluye ${C.paquetes.length > 1 ? '<em style="font-style:normal;color:var(--gris);">(<span data-nombre-paq="' + actual + '">' + (esc(P.nombre) || 'Paquete ' + (actual + 1)) + '</span>)</em>' : ''} · un punto por renglón</label>
             <textarea data-k="incluye" rows="4" class="cot-textarea" placeholder="Ej. Cobertura de 8 horas&#10;Video de 5 minutos&#10;40 fotos editadas">${esc(P.incluye != null ? P.incluye : incluyeSugerido(P))}</textarea>
             <button type="button" class="link" data-rellenar>↻ Llenar con lo de arriba</button></div>
@@ -1136,6 +1138,9 @@ function abrirMiNegocio(alGuardar){
         <div class="campo"><label>Correo</label><input id="n-correo" value="${esc(N.correo)}" inputmode="email" placeholder="hola@tunegocio.com"></div>
       </div>
       <div class="campo"><label>Instagram o página web</label><input id="n-redes" value="${esc(N.redes)}" placeholder="Ej. @estudioluz"></div>
+      <div class="campo"><label>Sobre tu negocio (opcional)</label>
+        <textarea id="n-sobre" rows="3" class="cot-textarea" placeholder="Ej. Somos un estudio de foto y video en Querétaro. Nos especializamos en bodas y eventos, y nos encanta contar historias reales.">${esc(N.sobre || '')}</textarea>
+        <div class="ayuda">Una o dos frases. Sale en todas tus cotizaciones.</div></div>
       <div class="modal-pie"><div class="der"><button class="btn ghost" data-cerrar>Cancelar</button><button class="btn" id="n-guardar">Guardar</button></div></div>
     </div>`;
   document.body.appendChild(bg);
@@ -1156,7 +1161,7 @@ function abrirMiNegocio(alGuardar){
   });
   $('n-quitar').addEventListener('click', () => { N.logo = ''; $('n-prev').innerHTML = '<span>Sin logo</span>'; $('n-quitar').style.display = 'none'; });
   $('n-guardar').addEventListener('click', async () => {
-    ['nombre','whatsapp','correo','redes'].forEach(k => { N[k] = $('n-' + k).value.trim(); });
+    ['nombre','whatsapp','correo','redes','sobre'].forEach(k => { N[k] = $('n-' + k).value.trim(); });
     const btn = $('n-guardar'); btn.disabled = true; btn.textContent = 'Guardando…';
     const { data, error } = await sb.rpc('taller_guardar_negocio', { p_token: T.token, p_pin: T.pin, p_negocio: N });
     if(pinRechazado(data)){ cerrar(); return; }
@@ -1192,6 +1197,15 @@ function pdfDinero(n){
 function hexRgb(h){ const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); const v = parseInt(m ? m[1] : '0a0908', 16); return [v >> 16, (v >> 8) & 255, v & 255]; }
 const aclarar = (rgb, f) => rgb.map(c => Math.round(c + (255 - c) * f));
 
+// Mensaje de bienvenida que abre el PDF (cada quien lo puede editar)
+function introSugerida(p, C){
+  const nombre = String(p.cliente || '').trim().split(/\s+/)[0];
+  const opciones = C.paquetes.length > 1 ? 'las opciones que preparamos para ti' : 'lo que incluye';
+  return `${nombre ? 'Hola, ' + nombre + '. G' : 'G'}racias por pensar en nosotros para ${p.nombre || 'tu proyecto'}. `
+    + `Preparamos esta propuesta a la medida de lo que nos contaste: aquí encontrarás ${opciones}, la inversión y lo necesario para apartar tu fecha. `
+    + 'Si tienes cualquier duda o quieres ajustar algo, con gusto lo platicamos.';
+}
+
 // Lo que incluye, armado a partir de lo que se capturó en el cotizador
 function incluyeSugerido(pq){
   const lineas = [];
@@ -1213,7 +1227,7 @@ async function descargarPDF(p, C){
   const W = 612, H = 792, M = 48;
   let y = 0;
   const gris = [110, 106, 98], texto = [33, 31, 28];
-  const nuevaPagina = alto => { if(y + alto > H - 90){ doc.addPage(); doc.setFillColor(...marca); doc.rect(0, 0, W, 6, 'F'); y = M; } };
+  const nuevaPagina = alto => { if(y + alto > H - 52){ doc.addPage(); doc.setFillColor(...marca); doc.rect(0, 0, W, 6, 'F'); y = M; } };
 
   // Encabezado
   doc.setFillColor(...marca); doc.rect(0, 0, W, 8, 'F');
@@ -1238,7 +1252,16 @@ async function descargarPDF(p, C){
   doc.text(new Date().toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' }), W - M, y + 45, { align:'right' });
   y += Math.max(altoMarca, 50) + 22;
   doc.setDrawColor(228, 223, 214); doc.line(M, y, W - M, y);
-  y += 26;
+  y += 30;
+
+  // Mensaje de bienvenida
+  const intro = (C.pdf.intro != null ? C.pdf.intro : introSugerida(p, C)).trim();
+  if(intro){
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11.5); doc.setTextColor(...texto);
+    const li = doc.splitTextToSize(intro, W - 2 * M);
+    doc.text(li, M, y, { lineHeightFactor: 1.45 });
+    y += li.length * 11.5 * 1.45 + 16;
+  }
 
   // Datos del proyecto
   const dato = (etq, val) => {
@@ -1247,13 +1270,13 @@ async function descargarPDF(p, C){
     doc.text(etq.toUpperCase(), M, y);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(...texto);
     doc.text(String(val), M + 120, y);
-    y += 20;
+    y += 18;
   };
   dato('Para', p.cliente);
   dato('Proyecto', p.nombre);
   dato('Servicio', C.tipo);
   if(C.pdf.fecha_evento) dato('Fecha', new Date(C.pdf.fecha_evento + 'T12:00:00').toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' }));
-  y += 12;
+  y += 8;
 
   // Paquetes
   C.paquetes.forEach((pq, i) => {
@@ -1261,7 +1284,7 @@ async function descargarPDF(p, C){
     const items = (pq.incluye != null ? pq.incluye : incluyeSugerido(pq)).split('\n').map(s => s.trim()).filter(Boolean);
     doc.setFontSize(10.5);
     const lineas = items.flatMap(it => doc.splitTextToSize(it, W - 2 * M - 46));
-    const alto = 64 + lineas.length * 15 + (items.length ? 12 : 0) + 22;
+    const alto = 56 + lineas.length * 14 + (items.length ? 8 : 0) + 16;
     nuevaPagina(alto);
     doc.setFillColor(...aclarar(marca, 0.92)); doc.setDrawColor(...aclarar(marca, 0.7));
     doc.roundedRect(M, y, W - 2 * M, alto, 8, 8, 'FD');
@@ -1281,25 +1304,30 @@ async function descargarPDF(p, C){
         const ls = doc.splitTextToSize(it, W - 2 * M - 46);
         doc.setTextColor(...marca); doc.text('•', M + 20, yy + 8);
         doc.setTextColor(...texto); doc.text(ls, M + 32, yy + 8);
-        yy += ls.length * 15;
+        yy += ls.length * 14;
       });
     }
     doc.setFontSize(9.5); doc.setTextColor(...gris);
-    doc.text(`Anticipo para apartar (50%): ${pdfDinero(r.anticipo)}`, M + 20, y + alto - 16);
-    y += alto + 14;
+    doc.text(`Anticipo para apartar (50%): ${pdfDinero(r.anticipo)}`, M + 20, y + alto - 14);
+    y += alto + 12;
   });
 
-  // Condiciones
+  // Cierre: "Sobre tu negocio" y condiciones, lado a lado para que quepa en una hoja
   const vence = new Date(); vence.setDate(vence.getDate() + (num(C.pdf.vigencia) || 15));
   const condiciones = [C.pdf.notas, `Esta cotización es válida por ${num(C.pdf.vigencia) || 15} días (hasta el ${vence.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' })}).`].filter(Boolean).join('\n');
-  doc.setFontSize(10);
-  const lc = doc.splitTextToSize(condiciones, W - 2 * M);
-  nuevaPagina(30 + lc.length * 14);
-  y += 6;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...texto);
-  doc.text('Condiciones', M, y); y += 16;
-  doc.setFont('helvetica', 'normal'); doc.setTextColor(...gris);
-  doc.text(lc, M, y);
+  const columnas = [N.sobre && ['Sobre ' + (N.nombre || 'nosotros'), N.sobre], ['Condiciones', condiciones]].filter(Boolean);
+  const anchoCol = columnas.length > 1 ? (W - 2 * M - 24) / 2 : W - 2 * M;
+  doc.setFontSize(9.5);
+  const bloques = columnas.map(([t, txt]) => [t, doc.splitTextToSize(txt, anchoCol)]);
+  nuevaPagina(26 + Math.max(...bloques.map(([, l]) => l.length)) * 13);
+  y += 16;
+  bloques.forEach(([t, l], i) => {
+    const x = M + i * (anchoCol + 24);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...texto);
+    doc.text(t, x, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(...gris);
+    doc.text(l, x, y + 15, { lineHeightFactor: 1.35 });
+  });
 
   // Pie con datos de contacto en todas las páginas
   const contacto = [N.nombre, N.whatsapp && 'WhatsApp ' + N.whatsapp, N.correo, N.redes].filter(Boolean).join('   ·   ');
