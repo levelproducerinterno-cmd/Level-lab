@@ -1338,9 +1338,15 @@ function abrirCotizador(p){
     const t = e.target;
     if(t.dataset.k){
       const partes = t.dataset.k.split('.');
+      const tocaIncluye = /^(equipo|edicion)\./.test(t.dataset.k), antes = tocaIncluye ? incluyeSugerido(pq()) : '';
       let obj = pq();
       while(partes.length > 1) obj = obj[partes.shift()];
       obj[partes[0]] = t.value;
+      if(tocaIncluye){
+        sincronizarIncluye(pq(), antes);
+        const ta = bg.querySelector('[data-k="incluye"]');
+        if(ta) ta.value = pq().incluye != null ? pq().incluye : incluyeSugerido(pq());
+      }
       if(t.dataset.k === 'nombre'){
         const tab = bg.querySelector(`[data-tab="${actual}"]`); if(tab) tab.textContent = t.value || 'Paquete ' + (actual + 1);
         bg.querySelectorAll(`[data-nombre-paq="${actual}"]`).forEach(el => { el.textContent = t.value || 'Paquete ' + (actual + 1); });
@@ -1382,7 +1388,7 @@ function abrirCotizador(p){
       actual = Math.max(0, actual - 1);
       render();
     }
-    if(d.solo){ pq().solo = d.solo === '1'; render(); }
+    if(d.solo){ const antes = incluyeSugerido(pq()); pq().solo = d.solo === '1'; sincronizarIncluye(pq(), antes); render(); }
     if(d.agregar){
       const nuevo = d.agregar === 'equipo' ? { puesto:'', cant:1, pago:'' } : { concepto:'', costo:'' };
       pq()[d.agregar].push(nuevo);
@@ -1390,7 +1396,7 @@ function abrirCotizador(p){
       const inputs = bg.querySelectorAll(`[data-k^="${d.agregar}.${pq()[d.agregar].length - 1}."]`);
       if(inputs[0]) inputs[0].focus();
     }
-    if(d.quitar){ const [campo, i] = d.quitar.split('.'); pq()[campo].splice(+i, 1); render(); }
+    if(d.quitar){ const antes = incluyeSugerido(pq()); const [campo, i] = d.quitar.split('.'); pq()[campo].splice(+i, 1); sincronizarIncluye(pq(), antes); render(); }
     if(d.elegido){ C.elegido = +d.elegido; render(); }
     if(d.negocio !== undefined){ abrirMiNegocio(render); }
     if(d.rellenar !== undefined){ pq().incluye = incluyeSugerido(pq()); render(); }
@@ -1540,6 +1546,25 @@ function incluyeSugerido(pq){
   }
   pq.edicion.filter(r => r.concepto).forEach(r => lineas.push(r.concepto));
   return lineas.join('\n');
+}
+
+// Si el paquete ya tiene su "Lo que incluye" escrito, lo mantenemos al día con lo capturado arriba:
+// lo que se quita de equipo/edición se quita de la lista, lo nuevo se agrega y lo escrito a mano se respeta.
+function sincronizarIncluye(pq, antes){
+  if(pq.incluye == null) return;
+  const A = antes.split('\n').filter(Boolean), D = incluyeSugerido(pq).split('\n').filter(Boolean);
+  const esEquipo = l => l.startsWith('Equipo de producción');
+  const quitados = A.filter(l => !D.includes(l)), nuevos = D.filter(l => !A.includes(l));
+  let lineas = pq.incluye.split('\n');
+  // Un renglón que cambió de nombre se reemplaza en su mismo lugar
+  quitados.forEach(viejo => {
+    const i = lineas.indexOf(viejo);
+    const j = nuevos.findIndex(n => esEquipo(n) === esEquipo(viejo));
+    if(i >= 0 && j >= 0) lineas[i] = nuevos.splice(j, 1)[0];
+    else if(i >= 0) lineas.splice(i, 1);
+  });
+  nuevos.forEach(n => { if(!lineas.includes(n)) esEquipo(n) ? lineas.unshift(n) : lineas.push(n); });
+  pq.incluye = lineas.join('\n');
 }
 
 async function descargarPDF(p, C){
