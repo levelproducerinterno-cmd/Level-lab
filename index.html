@@ -2360,7 +2360,7 @@ function prDibujar(ctx, k, B, P, proy){
           ctx.fillStyle = PR_TINTA; ctx.font = '500 22px Montserrat'; ctx.letterSpacing = '1px';
           y = prTexto(ctx, it, x + 90, y, bw - 130, 30, 'left', true) + 14; ctx.letterSpacing = '0px';
         });
-        const monto = C.impuesto.activo ? r.precio : r.total;
+        const monto = r.total;   // con IVA cuando está activado, igual que en la cotización
         const etq = '$' + Math.round(monto).toLocaleString('es-MX');
         ctx.font = '700 54px Montserrat'; const ew = ctx.measureText(etq).width;
         ctx.font = '500 24px Montserrat'; const mw = ctx.measureText(MONEDA).width;
@@ -2368,7 +2368,7 @@ function prDibujar(ctx, k, B, P, proy){
         ctx.fillStyle = PR_TINTA; ctx.textAlign = 'left';
         ctx.font = '700 54px Montserrat'; ctx.fillText(etq, sx, 870);
         ctx.font = '500 24px Montserrat'; ctx.fillText(MONEDA, sx + ew + 12, 870);
-        if(C.impuesto.activo){ ctx.fillStyle = prMarca(); ctx.font = '500 20px Montserrat'; ctx.textAlign = 'left'; ctx.fillText(`El precio no incluye IVA (${num(C.impuesto.pct)}%)`, x, 955); }
+        if(C.impuesto.activo){ ctx.fillStyle = prMarca(); ctx.font = '500 20px Montserrat'; ctx.textAlign = 'left'; ctx.fillText(`Precio con IVA incluido (${num(C.impuesto.pct)}%)`, x, 955); }
       });
     }
   }
