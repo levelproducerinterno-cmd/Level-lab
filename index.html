@@ -349,6 +349,9 @@
   .si-item p{font-size:1.15rem;}
   .si-vacio{color:#aaa094;font-style:italic;}
   @media (max-width:700px){ .si-panel h2{font-size:2rem;} .si-cuerpo{padding-top:36px;} }
+  .aviso-version{position:fixed;z-index:250;top:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--linea);border-radius:14px;padding:10px 12px 10px 18px;box-shadow:0 8px 28px rgba(0,0,0,.15);font-size:0.9rem;font-weight:600;width:max-content;max-width:calc(100% - 32px);}
+  @media (max-width:640px){ .aviso-version{left:16px;right:16px;transform:none;width:auto;max-width:none;justify-content:space-between;} }
+  .aviso-version .btn{padding:9px 16px;font-size:0.85rem;flex:0 0 auto;}
   .toast{position:fixed;z-index:300;bottom:22px;left:50%;transform:translateX(-50%);background:var(--negro);color:#fff;padding:11px 18px;border-radius:10px;font-size:0.88rem;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.2);}
   .cargando{text-align:center;color:var(--gris);padding:60px 20px;}
 
@@ -3808,6 +3811,32 @@ function editarClase(c, m){
     }
   });
 }
+
+// ============ Aviso de versión nueva ============
+// Si subimos cambios mientras alguien tiene la página abierta, le aparece un botón para actualizar.
+let VERSION_ACTUAL = null;
+async function versionServidor(){
+  try {
+    const r = await fetch('/', { method:'HEAD', cache:'no-store' });
+    return r.headers.get('etag') || r.headers.get('last-modified');
+  } catch(e){ return null; }
+}
+async function revisarVersion(){
+  const v = await versionServidor();
+  if(!v) return;
+  if(!VERSION_ACTUAL){ VERSION_ACTUAL = v; return; }
+  if(v !== VERSION_ACTUAL && !document.getElementById('aviso-version')){
+    const a = document.createElement('div');
+    a.id = 'aviso-version';
+    a.className = 'aviso-version';
+    a.innerHTML = '<span>✨ Hay una versión nueva de la plataforma</span><button class="btn">Actualizar</button>';
+    a.querySelector('button').addEventListener('click', () => location.reload());
+    document.body.appendChild(a);
+  }
+}
+revisarVersion();
+setInterval(revisarVersion, 10 * 60 * 1000);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') revisarVersion(); });
 
 // ============ Arranque ============
 // ?t=TOKEN → mundo Level Lab del alumno. Sin token → panel (pide contraseña).
