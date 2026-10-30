@@ -618,7 +618,11 @@ function toast(msg){
 function iniciales(nombre){
   return String(nombre || '?').trim().split(/\s+/).slice(0,2).map(p => p[0]).join('').toUpperCase();
 }
-function linkAlumno(token){ return location.origin + '/?t=' + token; }
+// Dirección oficial: los links de alumnos siempre salen con ella, aunque el panel se abra desde otra
+const DOMINIO = 'https://level-lab.vercel.app';
+function linkAlumno(token){ return DOMINIO + '/?t=' + token; }
+// Las direcciones de cada versión de Vercel (…-levelproducer.vercel.app) quedan congeladas: mandamos a la oficial
+if(/-levelproducer\.vercel\.app$/.test(location.hostname)) location.replace(DOMINIO + location.pathname + location.search + location.hash);
 
 // ============================================================
 // ============ TABLERO (lo que ve cada alumno) ================
